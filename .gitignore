@@ -1,0 +1,53 @@
+########################################
+# Visual Studio / C# (basic)
+########################################
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio workspace/cache
+.vs/
+
+# Build outputs
+bin/
+obj/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+
+# Test results
+[Tt]est[Rr]esult*/
+[Tt]est[Rr]esults/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet
+packages/
+*.nupkg
+# Uncomment if you use Paket
+# .paket/
+
+# Rider / JetBrains (if ever used)
+.idea/
+*.sln.iml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# VS Code (if ever used)
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
