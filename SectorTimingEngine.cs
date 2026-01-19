@@ -290,6 +290,43 @@ namespace User.PluginMiniSectors
 
             if (lapWrapped)
             {
+                // Finalize the last sector's time before copying to last lap
+                // This captures the time from the last corner boundary to the start/finish line
+                if (_prevSectorNumber > 0 && _prevSectorNumber <= MaxSectors)
+                {
+                    // If lap time has reset, use the previous frame's lap time; otherwise use current
+                    // (position wrap can be detected before lap time resets in some sims)
+                    double effectiveLapTime = lapTimeReset ? _prevLapTimeSec : currentLapTimeSec;
+                    double finalSectorTime = effectiveLapTime - _sectorStartLapTimeSec;
+                    if (finalSectorTime > 0)
+                    {
+                        _currentLapSectorTimesSec[_prevSectorNumber] = finalSectorTime;
+
+                        // Update session best if applicable
+                        if (ShouldUpdateSessionBest(finalSectorTime, _sessionBestSectorTimesSec[_prevSectorNumber], isLapValid))
+                        {
+                            _sessionBestSectorTimesSec[_prevSectorNumber] = finalSectorTime;
+
+                            // Check if this also beats all-time best, and persist if so
+                            bool beatsAllTimeBest = _allTimeBestSectorTimesSec[_prevSectorNumber] < 0 ||
+                                                    finalSectorTime < _allTimeBestSectorTimesSec[_prevSectorNumber];
+                            if (beatsAllTimeBest)
+                            {
+                                _allTimeBestSectorTimesSec[_prevSectorNumber] = finalSectorTime;
+
+                                // Persist to repository
+                                if (_repository != null && !string.IsNullOrWhiteSpace(_currentCarModel))
+                                {
+                                    _repository.SaveSectorBest(TrackId, _prevSectorNumber, finalSectorTime,
+                                                               _currentCarModel, _currentConditions);
+                                }
+                            }
+                        }
+
+                        LastCompletedSectorTime = finalSectorTime;
+                    }
+                }
+
                 FinalizeLapToLastLap();
                 _sectorStartLapTimeSec = currentLapTimeSec;
                 _prevTp = tp;
