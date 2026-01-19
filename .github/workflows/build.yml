@@ -17,6 +17,9 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Setup VSTest
+        uses: darenm/Setup-VSTest@v1.3
+
       - name: Setup NuGet
         uses: nuget/setup-nuget@v2
 
@@ -29,10 +32,13 @@ jobs:
         run: echo "SIMHUB_INSTALL_PATH=C:\SimHub\" >> $env:GITHUB_ENV
 
       - name: Restore NuGet packages
-        run: nuget restore User.PluginSdkDemo.csproj -PackagesDirectory packages
+        run: nuget restore User.PluginMiniSectors.sln -PackagesDirectory packages
 
       - name: Build
-        run: msbuild User.PluginSdkDemo.csproj /p:Configuration=Release /p:PostBuildEvent=
+        run: msbuild User.PluginMiniSectors.sln /p:Configuration=Release /p:PostBuildEvent=
+
+      - name: Run tests
+        run: vstest.console.exe User.PluginMiniSectors.Tests\bin\Release\User.PluginMiniSectors.Tests.dll
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
