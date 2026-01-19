@@ -122,6 +122,1064 @@ Static text: just use `S1`, `S2`, `S3`, etc. No JavaScript needed.
 
 ---
 
+## Calculating Most Recent Completed Sector Time in JavaScript
+
+Instead of adding extra plugin properties, you can calculate the "most recent completed time" for each sector directly in the dashboard using JavaScript. This approach:
+
+- Shows current lap time if the sector was completed this lap
+- Falls back to last lap time if the sector hasn't been completed yet this lap
+- Keeps the plugin simple while giving you flexible display options
+
+### How It Works
+
+The logic compares the sector number to `LastCompletedSectorNumber`:
+
+```
+If sector N <= LastCompletedSectorNumber:
+    → Use SectorTime_N (completed this lap)
+Else:
+    → Use LastLapSectorTime_N (from previous lap)
+```
+
+**Example:** You're currently in sector 5 (so sectors 1-4 are complete this lap)
+- S1-S4: Show `SectorTime_01` through `_04` (current lap)
+- S5-S15: Show `LastLapSectorTime_05` through `_15` (previous lap)
+
+---
+
+### Most Recent Sector Time (Text binding)
+
+Use these for the time column in your overlay. Shows the most recently completed time for each sector.
+
+**Sector 1:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 1) {
+    time = $prop('MiniSectors.SectorTime_01');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_01');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 2:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 2) {
+    time = $prop('MiniSectors.SectorTime_02');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_02');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 3:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 3) {
+    time = $prop('MiniSectors.SectorTime_03');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_03');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 4:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 4) {
+    time = $prop('MiniSectors.SectorTime_04');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_04');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 5:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 5) {
+    time = $prop('MiniSectors.SectorTime_05');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_05');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 6:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 6) {
+    time = $prop('MiniSectors.SectorTime_06');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_06');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 7:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 7) {
+    time = $prop('MiniSectors.SectorTime_07');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_07');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 8:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 8) {
+    time = $prop('MiniSectors.SectorTime_08');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_08');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 9:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 9) {
+    time = $prop('MiniSectors.SectorTime_09');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_09');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 10:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 10) {
+    time = $prop('MiniSectors.SectorTime_10');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_10');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 11:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 11) {
+    time = $prop('MiniSectors.SectorTime_11');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_11');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 12:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 12) {
+    time = $prop('MiniSectors.SectorTime_12');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_12');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 13:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 13) {
+    time = $prop('MiniSectors.SectorTime_13');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_13');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 14:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 14) {
+    time = $prop('MiniSectors.SectorTime_14');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_14');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+**Sector 15:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time;
+if (lastCompleted >= 15) {
+    time = $prop('MiniSectors.SectorTime_15');
+} else {
+    time = $prop('MiniSectors.LastLapSectorTime_15');
+}
+if (time == null || time < 0) return '---';
+return time.toFixed(3);
+```
+
+---
+
+### Delta to Session Best - Using Most Recent Time (Text binding)
+
+These calculate delta using the most recent completed time for each sector.
+
+**Sector 1:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 1)
+    ? $prop('MiniSectors.SectorTime_01')
+    : $prop('MiniSectors.LastLapSectorTime_01');
+var best = $prop('MiniSectors.SessionBestSectorTime_01');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 2:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 2)
+    ? $prop('MiniSectors.SectorTime_02')
+    : $prop('MiniSectors.LastLapSectorTime_02');
+var best = $prop('MiniSectors.SessionBestSectorTime_02');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 3:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 3)
+    ? $prop('MiniSectors.SectorTime_03')
+    : $prop('MiniSectors.LastLapSectorTime_03');
+var best = $prop('MiniSectors.SessionBestSectorTime_03');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 4:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 4)
+    ? $prop('MiniSectors.SectorTime_04')
+    : $prop('MiniSectors.LastLapSectorTime_04');
+var best = $prop('MiniSectors.SessionBestSectorTime_04');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 5:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 5)
+    ? $prop('MiniSectors.SectorTime_05')
+    : $prop('MiniSectors.LastLapSectorTime_05');
+var best = $prop('MiniSectors.SessionBestSectorTime_05');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 6:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 6)
+    ? $prop('MiniSectors.SectorTime_06')
+    : $prop('MiniSectors.LastLapSectorTime_06');
+var best = $prop('MiniSectors.SessionBestSectorTime_06');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 7:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 7)
+    ? $prop('MiniSectors.SectorTime_07')
+    : $prop('MiniSectors.LastLapSectorTime_07');
+var best = $prop('MiniSectors.SessionBestSectorTime_07');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 8:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 8)
+    ? $prop('MiniSectors.SectorTime_08')
+    : $prop('MiniSectors.LastLapSectorTime_08');
+var best = $prop('MiniSectors.SessionBestSectorTime_08');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 9:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 9)
+    ? $prop('MiniSectors.SectorTime_09')
+    : $prop('MiniSectors.LastLapSectorTime_09');
+var best = $prop('MiniSectors.SessionBestSectorTime_09');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 10:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 10)
+    ? $prop('MiniSectors.SectorTime_10')
+    : $prop('MiniSectors.LastLapSectorTime_10');
+var best = $prop('MiniSectors.SessionBestSectorTime_10');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 11:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 11)
+    ? $prop('MiniSectors.SectorTime_11')
+    : $prop('MiniSectors.LastLapSectorTime_11');
+var best = $prop('MiniSectors.SessionBestSectorTime_11');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 12:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 12)
+    ? $prop('MiniSectors.SectorTime_12')
+    : $prop('MiniSectors.LastLapSectorTime_12');
+var best = $prop('MiniSectors.SessionBestSectorTime_12');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 13:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 13)
+    ? $prop('MiniSectors.SectorTime_13')
+    : $prop('MiniSectors.LastLapSectorTime_13');
+var best = $prop('MiniSectors.SessionBestSectorTime_13');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 14:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 14)
+    ? $prop('MiniSectors.SectorTime_14')
+    : $prop('MiniSectors.LastLapSectorTime_14');
+var best = $prop('MiniSectors.SessionBestSectorTime_14');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 15:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 15)
+    ? $prop('MiniSectors.SectorTime_15')
+    : $prop('MiniSectors.LastLapSectorTime_15');
+var best = $prop('MiniSectors.SessionBestSectorTime_15');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+---
+
+### Delta to All-Time Best - Using Most Recent Time (Text binding)
+
+**Sector 1:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 1)
+    ? $prop('MiniSectors.SectorTime_01')
+    : $prop('MiniSectors.LastLapSectorTime_01');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_01');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 2:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 2)
+    ? $prop('MiniSectors.SectorTime_02')
+    : $prop('MiniSectors.LastLapSectorTime_02');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_02');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 3:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 3)
+    ? $prop('MiniSectors.SectorTime_03')
+    : $prop('MiniSectors.LastLapSectorTime_03');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_03');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 4:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 4)
+    ? $prop('MiniSectors.SectorTime_04')
+    : $prop('MiniSectors.LastLapSectorTime_04');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_04');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 5:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 5)
+    ? $prop('MiniSectors.SectorTime_05')
+    : $prop('MiniSectors.LastLapSectorTime_05');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_05');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 6:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 6)
+    ? $prop('MiniSectors.SectorTime_06')
+    : $prop('MiniSectors.LastLapSectorTime_06');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_06');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 7:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 7)
+    ? $prop('MiniSectors.SectorTime_07')
+    : $prop('MiniSectors.LastLapSectorTime_07');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_07');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 8:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 8)
+    ? $prop('MiniSectors.SectorTime_08')
+    : $prop('MiniSectors.LastLapSectorTime_08');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_08');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 9:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 9)
+    ? $prop('MiniSectors.SectorTime_09')
+    : $prop('MiniSectors.LastLapSectorTime_09');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_09');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 10:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 10)
+    ? $prop('MiniSectors.SectorTime_10')
+    : $prop('MiniSectors.LastLapSectorTime_10');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_10');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 11:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 11)
+    ? $prop('MiniSectors.SectorTime_11')
+    : $prop('MiniSectors.LastLapSectorTime_11');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_11');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 12:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 12)
+    ? $prop('MiniSectors.SectorTime_12')
+    : $prop('MiniSectors.LastLapSectorTime_12');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_12');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 13:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 13)
+    ? $prop('MiniSectors.SectorTime_13')
+    : $prop('MiniSectors.LastLapSectorTime_13');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_13');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 14:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 14)
+    ? $prop('MiniSectors.SectorTime_14')
+    : $prop('MiniSectors.LastLapSectorTime_14');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_14');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+**Sector 15:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 15)
+    ? $prop('MiniSectors.SectorTime_15')
+    : $prop('MiniSectors.LastLapSectorTime_15');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_15');
+if (time == null || best == null || time < 0 || best < 0) return '';
+var delta = time - best;
+var sign = delta >= 0 ? '+' : '';
+return sign + delta.toFixed(3);
+```
+
+---
+
+### Delta Color - Session Best Using Most Recent Time (Color binding)
+
+**Sector 1:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 1)
+    ? $prop('MiniSectors.SectorTime_01')
+    : $prop('MiniSectors.LastLapSectorTime_01');
+var best = $prop('MiniSectors.SessionBestSectorTime_01');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 2:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 2)
+    ? $prop('MiniSectors.SectorTime_02')
+    : $prop('MiniSectors.LastLapSectorTime_02');
+var best = $prop('MiniSectors.SessionBestSectorTime_02');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 3:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 3)
+    ? $prop('MiniSectors.SectorTime_03')
+    : $prop('MiniSectors.LastLapSectorTime_03');
+var best = $prop('MiniSectors.SessionBestSectorTime_03');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 4:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 4)
+    ? $prop('MiniSectors.SectorTime_04')
+    : $prop('MiniSectors.LastLapSectorTime_04');
+var best = $prop('MiniSectors.SessionBestSectorTime_04');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 5:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 5)
+    ? $prop('MiniSectors.SectorTime_05')
+    : $prop('MiniSectors.LastLapSectorTime_05');
+var best = $prop('MiniSectors.SessionBestSectorTime_05');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 6:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 6)
+    ? $prop('MiniSectors.SectorTime_06')
+    : $prop('MiniSectors.LastLapSectorTime_06');
+var best = $prop('MiniSectors.SessionBestSectorTime_06');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 7:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 7)
+    ? $prop('MiniSectors.SectorTime_07')
+    : $prop('MiniSectors.LastLapSectorTime_07');
+var best = $prop('MiniSectors.SessionBestSectorTime_07');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 8:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 8)
+    ? $prop('MiniSectors.SectorTime_08')
+    : $prop('MiniSectors.LastLapSectorTime_08');
+var best = $prop('MiniSectors.SessionBestSectorTime_08');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 9:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 9)
+    ? $prop('MiniSectors.SectorTime_09')
+    : $prop('MiniSectors.LastLapSectorTime_09');
+var best = $prop('MiniSectors.SessionBestSectorTime_09');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 10:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 10)
+    ? $prop('MiniSectors.SectorTime_10')
+    : $prop('MiniSectors.LastLapSectorTime_10');
+var best = $prop('MiniSectors.SessionBestSectorTime_10');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 11:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 11)
+    ? $prop('MiniSectors.SectorTime_11')
+    : $prop('MiniSectors.LastLapSectorTime_11');
+var best = $prop('MiniSectors.SessionBestSectorTime_11');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 12:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 12)
+    ? $prop('MiniSectors.SectorTime_12')
+    : $prop('MiniSectors.LastLapSectorTime_12');
+var best = $prop('MiniSectors.SessionBestSectorTime_12');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 13:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 13)
+    ? $prop('MiniSectors.SectorTime_13')
+    : $prop('MiniSectors.LastLapSectorTime_13');
+var best = $prop('MiniSectors.SessionBestSectorTime_13');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 14:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 14)
+    ? $prop('MiniSectors.SectorTime_14')
+    : $prop('MiniSectors.LastLapSectorTime_14');
+var best = $prop('MiniSectors.SessionBestSectorTime_14');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+**Sector 15:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 15)
+    ? $prop('MiniSectors.SectorTime_15')
+    : $prop('MiniSectors.LastLapSectorTime_15');
+var best = $prop('MiniSectors.SessionBestSectorTime_15');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#00FF00';
+if (delta > 0.001) return '#FF0000';
+return '#FFFF00';
+```
+
+---
+
+### Delta Color - All-Time Best Using Most Recent Time (Color binding)
+
+**Sector 1:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 1)
+    ? $prop('MiniSectors.SectorTime_01')
+    : $prop('MiniSectors.LastLapSectorTime_01');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_01');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 2:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 2)
+    ? $prop('MiniSectors.SectorTime_02')
+    : $prop('MiniSectors.LastLapSectorTime_02');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_02');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 3:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 3)
+    ? $prop('MiniSectors.SectorTime_03')
+    : $prop('MiniSectors.LastLapSectorTime_03');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_03');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 4:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 4)
+    ? $prop('MiniSectors.SectorTime_04')
+    : $prop('MiniSectors.LastLapSectorTime_04');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_04');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 5:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 5)
+    ? $prop('MiniSectors.SectorTime_05')
+    : $prop('MiniSectors.LastLapSectorTime_05');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_05');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 6:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 6)
+    ? $prop('MiniSectors.SectorTime_06')
+    : $prop('MiniSectors.LastLapSectorTime_06');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_06');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 7:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 7)
+    ? $prop('MiniSectors.SectorTime_07')
+    : $prop('MiniSectors.LastLapSectorTime_07');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_07');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 8:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 8)
+    ? $prop('MiniSectors.SectorTime_08')
+    : $prop('MiniSectors.LastLapSectorTime_08');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_08');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 9:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 9)
+    ? $prop('MiniSectors.SectorTime_09')
+    : $prop('MiniSectors.LastLapSectorTime_09');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_09');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 10:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 10)
+    ? $prop('MiniSectors.SectorTime_10')
+    : $prop('MiniSectors.LastLapSectorTime_10');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_10');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 11:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 11)
+    ? $prop('MiniSectors.SectorTime_11')
+    : $prop('MiniSectors.LastLapSectorTime_11');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_11');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 12:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 12)
+    ? $prop('MiniSectors.SectorTime_12')
+    : $prop('MiniSectors.LastLapSectorTime_12');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_12');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 13:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 13)
+    ? $prop('MiniSectors.SectorTime_13')
+    : $prop('MiniSectors.LastLapSectorTime_13');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_13');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 14:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 14)
+    ? $prop('MiniSectors.SectorTime_14')
+    : $prop('MiniSectors.LastLapSectorTime_14');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_14');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+**Sector 15:**
+```javascript
+var lastCompleted = $prop('MiniSectors.LastCompletedSectorNumber');
+var time = (lastCompleted >= 15)
+    ? $prop('MiniSectors.SectorTime_15')
+    : $prop('MiniSectors.LastLapSectorTime_15');
+var best = $prop('MiniSectors.AllTimeBestSectorTime_15');
+if (time == null || best == null || time < 0 || best < 0) return '#FFFFFF';
+var delta = time - best;
+if (delta < -0.001) return '#AA00FF';
+if (delta > 0.001) return '#FF0000';
+return '#AA00FF';
+```
+
+---
+
+## Alternative: Last Lap Only Snippets
+
+If you prefer to always show the previous completed lap's times (simpler, no mixing of current/last lap data), use these snippets instead.
+
 ### Last Lap Sector Time (Text binding)
 
 **Sector 1:**
