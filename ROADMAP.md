@@ -4,56 +4,7 @@ Feature roadmap for the MiniSectors SimHub plugin. Focus: ACC (Assetto Corsa Com
 
 ---
 
-## Feature 1: Session Best Sector Times
-
-**Goal**: Track the fastest time achieved in each sector during the current session.
-
-**Terminology Note**:
-- **Session** = A period of track activity (Practice, Qualifying, Race). Resets when you exit to menu or restart.
-- **Stint** = Continuous driving between pit stops. Multiple stints can occur in one session.
-
-We use "Session" here as it matches ACC's terminology and is more intuitive for general use.
-
-**New Properties**:
-- `SessionBestSectorTime_01` through `SessionBestSectorTime_60` - Best time per sector this session
-
-**Implementation**:
-- Add `_sessionBestSectorTimesSec` array alongside existing lap arrays
-- On sector completion, compare against session best and update if faster
-- Reset session bests when track changes or game restarts
-
-**Use Case**: See how your current sector compares to your best effort this session.
-
----
-
-## Feature 2: All-Time Best Sector Times (SQLite Persistence)
-
-**Goal**: Persist best sector times to SQLite database, surviving across sessions.
-
-**Database Schema**:
-```sql
-CREATE TABLE sector_bests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    track_id TEXT NOT NULL,
-    sector_number INTEGER NOT NULL,
-    best_time_sec REAL NOT NULL,
-    car_model TEXT,
-    recorded_at TEXT NOT NULL,
-    UNIQUE(track_id, sector_number, car_model)
-);
-```
-
-**New Properties**:
-- `AllTimeBestSectorTime_01` through `AllTimeBestSectorTime_60` - All-time best per sector
-
-**Implementation**:
-- Load all-time bests from SQLite on track load
-- Update database when a new all-time best is set
-- Store per track + car combination for accuracy
-
----
-
-## Feature 3: Sector Delta Display
+## Feature 1: Sector Delta Display
 
 **Goal**: Show the time difference between current sector and session/all-time best.
 
@@ -72,7 +23,7 @@ CREATE TABLE sector_bests (
 
 ---
 
-## Feature 4: Theoretical Best Lap Time
+## Feature 2: Theoretical Best Lap Time
 
 **Goal**: Calculate what your lap time would be if you matched your best in every sector.
 
@@ -91,41 +42,82 @@ CREATE TABLE sector_bests (
 
 ---
 
-## Feature 5: Per-Car Best Times
+## Feature 3: Per-Car All-Time Best Filtering
 
-**Goal**: Track separate best times for each car model driven.
+**Status**: Partially implemented - infrastructure complete, filtering not yet applied.
 
-**Database Schema Extension**:
-```sql
--- sector_bests table already includes car_model column
--- Add index for fast lookups
-CREATE INDEX idx_sector_bests_car ON sector_bests(track_id, car_model);
-```
+**Goal**: Filter all-time best comparisons by car model so dashboard deltas are meaningful.
+
+**Problem Solved**:
+Comparing sector times against an all-time best set in a GT3 car while driving a GT4 car isn't useful - you'll always be slower. The all-time best should default to comparing against your best in the *same* car.
+
+**Already Implemented**:
+- `CurrentCarModel` property exposed to SimHub
+- Database schema includes `car_model` column with proper indexing
+- Car model extracted from telemetry and stored with sector bests
+
+**Remaining Work**:
+- Add plugin setting: "Compare all-time best against" with options:
+  - "Same car only" (default)
+  - "All cars"
+- Modify `LoadAllTimeBestsForTrack()` to filter by car model when setting is enabled
+- Reload all-time bests when car changes (if filtering by car)
+
+**Use Case**: All-time best comparisons are meaningful regardless of which car you're driving.
+
+---
+
+## Feature 4: Last Reported Sector Times
+
+**Goal**: Provide persistent sector times that don't reset at lap boundaries.
+
+**Problem Solved**:
+When a lap completes, current lap sector times are cleared and copied to "last lap". This means at the start of a new lap, `SectorTime_12` immediately shows 0 even though you just completed it. Dashboards lose visibility into the most recent sector performance.
 
 **New Properties**:
-- `CurrentCarModel` - The car currently being driven
-- `CarBestSectorTime_01` through `CarBestSectorTime_60` - Best for current car
+- `LastReportedSectorTime_01` through `LastReportedSectorTime_15` - Most recent completed time per sector
+
+**Behavior**:
+| Event | SectorTime_XX | LastLapSectorTime_XX | LastReportedSectorTime_XX |
+|-------|---------------|----------------------|---------------------------|
+| Complete sector 3 | [3] = 12.5s | unchanged | [3] = 12.5s |
+| Complete sector 4 | [4] = 8.2s | unchanged | [4] = 8.2s |
+| Lap wraps | cleared to 0 | = old current | unchanged |
+| Next lap sector 1 | [1] = 9.1s | unchanged | [1] = 9.1s |
+
+**Key Difference from Other Arrays**:
+- `SectorTime_XX` - Current lap only, cleared at lap wrap
+- `LastLapSectorTime_XX` - Previous lap only, bulk-overwritten at lap wrap
+- `LastReportedSectorTime_XX` - Most recent completion, individual values persist until that sector is completed again
 
 **Implementation**:
-- Extract car model from ACC telemetry (`data.NewData.CarModel` or similar)
-- Filter SQLite queries by car model
-- Expose both global and car-specific bests
+- Add `_lastReportedSectorTimesSec` array in `SectorTimingEngine.cs`
+- Initialize to -1.0 (unset indicator, matches session best pattern)
+- Update on sector completion (both mid-lap transitions and final sector at lap wrap)
+- NOT cleared or bulk-overwritten at lap wrap
+- Expose via `GetLastReportedSectorTime(int sector)` and SimHub properties
 
-**Use Case**: Compare performance across different cars on the same track.
+**Use Case**: Dashboard always shows your most recent time for each sector, even at the start of a new lap.
 
 ---
 
 ## Implementation Priority
 
-1. **Session Best** - Foundation, no database changes needed
-2. **All-Time Best** - Builds on session best, adds persistence
-3. **Delta Display** - Leverages both best types, high dashboard value
-4. **Theoretical Best** - Aggregation of existing data
-5. **Per-Car Bests** - Extension of existing schema
+1. **Delta Display** - Leverages existing best times, high dashboard value
+2. **Theoretical Best** - Aggregation of existing data
+3. **Per-Car All-Time Best Filtering** - Add setting to filter all-time bests by car (default) or all cars
+4. **Last Reported Sector Times** - Simple array addition, high dashboard value
 
 ---
 
-## Future Ideas (Beyond Initial 5)
+## Completed Features
+
+- **Session Best Sector Times** - `SessionBestSectorTime_01` through `_60` properties
+- **All-Time Best Sector Times (SQLite)** - `AllTimeBestSectorTime_01` through `_60` with database persistence
+
+---
+
+## Future Ideas
 
 - **Stint tracking** - Best times per stint (resets on pit stop); useful for endurance racing to compare tire degradation
 - **Condition tracking** - Track temp, weather conditions stored with best times
