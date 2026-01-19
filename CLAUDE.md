@@ -23,6 +23,8 @@ msbuild User.PluginSdkDemo.csproj /p:Configuration=Debug
 
 **Note:** Close SimHub before building - the post-build copy will fail if SimHub has the DLLs locked.
 
+**WSL Build Details:** `build.sh` calls Windows MSBuild via `powershell.exe` since this is a .NET Framework 4.8 project that requires Windows tooling. The script reads `SIMHUB_INSTALL_PATH` from Windows user environment variables.
+
 **Debug:** Set debug target to SimHub's main exe (`SimHubWPF.exe`).
 
 ## Architecture
@@ -64,6 +66,28 @@ References loaded from `$(SIMHUB_INSTALL_PATH)`:
 - `log4net.dll` - Logging via `SimHub.Logging.Current`
 
 NuGet: `System.Data.SQLite` (Stub.System.Data.SQLite.Core.NetFramework 1.0.119.0)
+
+## Testing
+
+Test project: `User.PluginMiniSectors.Tests/` (MSTest, uses PackageReference)
+
+```bash
+# Build and run tests from WSL
+powershell.exe -Command "& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' User.PluginMiniSectors.sln /p:Configuration=Release /p:PostBuildEvent= /restore"
+
+powershell.exe -Command "& 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'User.PluginMiniSectors.Tests\bin\Release\User.PluginMiniSectors.Tests.dll'"
+```
+
+Tests cover `RangeLabel` and `TrackTurnMap` functionality. Internal types are exposed via `InternalsVisibleTo` in `Properties/AssemblyInfo.cs`.
+
+## CI/CD
+
+GitHub Actions workflow: `.github/workflows/build.yml`
+
+**SimHub SDK for CI:** The workflow downloads SimHub SDK DLLs from a separate repo since SimHub isn't installed on GitHub runners:
+- Repo: `https://github.com/jtexp/simhub-sdk`
+- Contains only the DLLs needed for compilation (not the full SimHub install)
+- Update this repo when upgrading SimHub versions
 
 ## Adding New Tracks
 
