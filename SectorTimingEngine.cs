@@ -8,7 +8,7 @@ namespace User.PluginMiniSectors
         // Constants
         // --------------------------------------------------------------------
 
-        public const int MaxSectors = 60;
+        public const int MaxSectors = 15;
 
         // --------------------------------------------------------------------
         // Public read-only properties
@@ -284,9 +284,10 @@ namespace User.PluginMiniSectors
                 return;
             }
 
-            // Lap wrap detection: lap time reset or track position wrap
+            // Lap wrap detection: use lap time reset as the authoritative signal
+            // This is the most reliable indicator - the game knows when a lap is completed
             bool lapTimeReset = currentLapTimeSec < _prevLapTimeSec - 1.0; // Allow small jitter
-            bool lapWrapped = IsLapWrap(_prevTp, tp) || lapTimeReset || (_prevSectorNumber > 0 && sectorNumber < _prevSectorNumber);
+            bool lapWrapped = lapTimeReset;
 
             if (lapWrapped)
             {
@@ -298,7 +299,10 @@ namespace User.PluginMiniSectors
                     // (position wrap can be detected before lap time resets in some sims)
                     double effectiveLapTime = lapTimeReset ? _prevLapTimeSec : currentLapTimeSec;
                     double finalSectorTime = effectiveLapTime - _sectorStartLapTimeSec;
-                    if (finalSectorTime > 0)
+
+                    // Minimum sector time threshold to filter out glitches
+                    const double MinSectorTimeSec = 0.5;
+                    if (finalSectorTime >= MinSectorTimeSec)
                     {
                         _currentLapSectorTimesSec[_prevSectorNumber] = finalSectorTime;
 
@@ -336,13 +340,17 @@ namespace User.PluginMiniSectors
             }
 
             // Sector transition detection
-            if (_prevSectorNumber > 0 && sectorNumber != _prevSectorNumber)
+            // Only allow forward sector transitions (sector increase) during a lap
+            // Sector decreases mid-lap are position glitches and should be ignored
+            if (_prevSectorNumber > 0 && sectorNumber > _prevSectorNumber)
             {
                 // Finalize the previous sector time
                 int prevSector = _prevSectorNumber;
                 double completedSectorTime = currentLapTimeSec - _sectorStartLapTimeSec;
 
-                if (prevSector >= 1 && prevSector <= MaxSectors && completedSectorTime > 0)
+                // Minimum sector time threshold to filter out glitches
+                const double MinSectorTimeSec = 0.5;
+                if (prevSector >= 1 && prevSector <= MaxSectors && completedSectorTime >= MinSectorTimeSec)
                 {
                     _currentLapSectorTimesSec[prevSector] = completedSectorTime;
 
