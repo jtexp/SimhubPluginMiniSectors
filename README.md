@@ -98,7 +98,3 @@ Edit `DataPluginMiniSectors.cs` and add entries to the `TrackTurnMap` dictionary
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md) for planned features.
-
-## License
-
-MIT
