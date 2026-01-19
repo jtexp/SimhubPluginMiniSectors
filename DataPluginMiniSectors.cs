@@ -50,6 +50,7 @@ namespace User.PluginMiniSectors
         // We store times as seconds
         private readonly double[] _currentLapSectorTimesSec = new double[MaxExposedSectors + 1]; // index 1..MaxExposedSectors
         private readonly double[] _lastLapSectorTimesSec = new double[MaxExposedSectors + 1];    // index 1..MaxExposedSectors
+        private readonly double[] _sessionBestSectorTimesSec = new double[MaxExposedSectors + 1]; // index 1..MaxExposedSectors, -1 = unset
 
         private double _currentSectorElapsedSec = 0.0;
         private double _lastCompletedSectorTimeSec = 0.0;
@@ -129,6 +130,12 @@ namespace User.PluginMiniSectors
             Array.Clear(_currentLapSectorTimesSec, 0, _currentLapSectorTimesSec.Length);
             Array.Clear(_lastLapSectorTimesSec, 0, _lastLapSectorTimesSec.Length);
 
+            // Initialize session bests to -1 (unset)
+            for (int i = 0; i < _sessionBestSectorTimesSec.Length; i++)
+            {
+                _sessionBestSectorTimesSec[i] = -1.0;
+            }
+
             _hasLastUpdate = false;
             _lastUpdateUtc = DateTime.MinValue;
         }
@@ -155,7 +162,7 @@ namespace User.PluginMiniSectors
             return prevTp > 0.95 && curTp < 0.05;
         }
 
-        private void UpdateTurnSectorAndTimingFromTelemetry(string trackId, double tp, DateTime nowUtc)
+        private void UpdateTurnSectorAndTimingFromTelemetry(string trackId, double tp, DateTime nowUtc, bool isLapValid)
         {
             // Track change detection (track id can sometimes appear late; be tolerant)
             bool trackChanged = !string.Equals(_currentTrackId ?? "", trackId ?? "", StringComparison.OrdinalIgnoreCase);
@@ -214,6 +221,12 @@ namespace User.PluginMiniSectors
                 if (prevSector >= 1 && prevSector <= MaxExposedSectors)
                 {
                     _currentLapSectorTimesSec[prevSector] = _currentSectorElapsedSec;
+
+                    // Update session best if applicable
+                    if (TrackData.ShouldUpdateSessionBest(_currentSectorElapsedSec, _sessionBestSectorTimesSec[prevSector], isLapValid))
+                    {
+                        _sessionBestSectorTimesSec[prevSector] = _currentSectorElapsedSec;
+                    }
                 }
 
                 _lastCompletedSectorTimeSec = _currentSectorElapsedSec;
@@ -250,8 +263,9 @@ namespace User.PluginMiniSectors
 
             string trackId = TryGetTrackId(data);
             double tp = TryGetTrackPositionPercent(data);
+            bool isLapValid = TryGetIsLapValid(data);
 
-            UpdateTurnSectorAndTimingFromTelemetry(trackId, tp, DateTime.UtcNow);
+            UpdateTurnSectorAndTimingFromTelemetry(trackId, tp, DateTime.UtcNow, isLapValid);
 
             // Existing sample logic retained (and corrected)
             if (data.OldData != null)
@@ -316,6 +330,14 @@ namespace User.PluginMiniSectors
                     {
                         if (sectorIndex < 1 || sectorIndex > MaxExposedSectors) return 0.0;
                         return _lastLapSectorTimesSec[sectorIndex];
+                    });
+
+                this.AttachDelegate(
+                    name: $"SessionBestSectorTime_{sectorIndex:00}",
+                    valueProvider: () =>
+                    {
+                        if (sectorIndex < 1 || sectorIndex > MaxExposedSectors) return -1.0;
+                        return _sessionBestSectorTimesSec[sectorIndex];
                     });
             }
 
@@ -399,6 +421,18 @@ namespace User.PluginMiniSectors
             catch
             {
                 return 0.0;
+            }
+        }
+
+        private static bool TryGetIsLapValid(in GameData data)
+        {
+            try
+            {
+                return data.NewData.IsLapValid;
+            }
+            catch
+            {
+                return false;
             }
         }
     }
