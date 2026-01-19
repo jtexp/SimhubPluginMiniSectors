@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SectorBestRepositoryTests.cs" />
+    <Compile Include="SectorTimingEngineTests.cs" />
     <Compile Include="SessionBestTests.cs" />
     <Compile Include="TrackDataTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

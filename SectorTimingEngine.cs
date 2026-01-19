@@ -387,7 +387,18 @@ namespace User.PluginMiniSectors
 
             _prevTp = tp;
             _prevLapTimeSec = currentLapTimeSec;
-            _prevSectorNumber = sectorNumber;
+
+            // Only update _prevSectorNumber for forward transitions or initial state
+            // This prevents backward glitches from corrupting subsequent forward transitions
+            if (_prevSectorNumber == 0 || sectorNumber >= _prevSectorNumber)
+            {
+                // Initialize sector start time when first entering a sector
+                if (_prevSectorNumber == 0)
+                {
+                    _sectorStartLapTimeSec = currentLapTimeSec;
+                }
+                _prevSectorNumber = sectorNumber;
+            }
         }
     }
 }
