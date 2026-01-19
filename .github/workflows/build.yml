@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Download SimHub SDK
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/jtexp/simhub-sdk/releases/download/v9.10.15/simhub-sdk-9.10.15.zip" -OutFile simhub-sdk.zip
+          Expand-Archive simhub-sdk.zip -DestinationPath C:\SimHub
+
+      - name: Set SIMHUB_INSTALL_PATH
+        run: echo "SIMHUB_INSTALL_PATH=C:\SimHub\" >> $env:GITHUB_ENV
+
+      - name: Restore NuGet packages
+        run: nuget restore User.PluginSdkDemo.csproj
+
+      - name: Build
+        run: msbuild User.PluginSdkDemo.csproj /p:Configuration=Release /p:PostBuildEvent=
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: User.PluginMiniSectors
+          path: |
+            bin/Release/User.PluginMiniSectors.dll
+            bin/Release/User.PluginMiniSectors.pdb
