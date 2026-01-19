@@ -8,6 +8,12 @@ Feature roadmap for the MiniSectors SimHub plugin. Focus: ACC (Assetto Corsa Com
 
 **Goal**: Track the fastest time achieved in each sector during the current session.
 
+**Terminology Note**:
+- **Session** = A period of track activity (Practice, Qualifying, Race). Resets when you exit to menu or restart.
+- **Stint** = Continuous driving between pit stops. Multiple stints can occur in one session.
+
+We use "Session" here as it matches ACC's terminology and is more intuitive for general use.
+
 **New Properties**:
 - `SessionBestSectorTime_01` through `SessionBestSectorTime_60` - Best time per sector this session
 
@@ -121,8 +127,8 @@ CREATE INDEX idx_sector_bests_car ON sector_bests(track_id, car_model);
 
 ## Future Ideas (Beyond Initial 5)
 
-- Stint tracking (best times per stint)
-- Condition tracking (track temp, weather)
-- Export/import personal bests
-- Sector performance trends over time
-- Integration with ACC's native sector data
+- **Stint tracking** - Best times per stint (resets on pit stop); useful for endurance racing to compare tire degradation
+- **Condition tracking** - Track temp, weather conditions stored with best times
+- **Export/import personal bests** - Share or backup your data
+- **Sector performance trends** - Visualize improvement over time
+- **ACC native sector integration** - Compare mini sectors against ACC's built-in sector data
