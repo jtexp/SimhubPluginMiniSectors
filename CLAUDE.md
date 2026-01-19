@@ -70,3 +70,25 @@ NuGet: `System.Data.SQLite` (Stub.System.Data.SQLite.Core.NetFramework 1.0.119.0
 Add entries to the `TrackTurnMap` dictionary in `TrackData.cs`. Each track needs:
 1. A key matching the `TrackName` from game telemetry (case-insensitive)
 2. An array of `RangeLabel` with TrackPositionPercent start/end values and corner names
+
+## GitHub Actions
+
+To check CI build status, use a polling loop instead of a single sleep:
+
+```bash
+# Poll every 5 seconds until build completes
+for i in {1..60}; do
+  status=$(gh run list --limit 1 --json status --jq '.[0].status')
+  echo "Build status: $status"
+  if [ "$status" = "completed" ]; then
+    gh run list --limit 1
+    break
+  fi
+  sleep 5
+done
+```
+
+To view failed build logs:
+```bash
+gh run view <run-id> --log-failed
+```
