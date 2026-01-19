@@ -136,7 +136,7 @@ namespace User.PluginMiniSectors.Tests
 
             // Sector 1 should NOT have a time recorded (was < 0.5s)
             double sector1Time = _engine.GetCurrentLapSectorTime(1);
-            Assert.AreEqual(0.0, sector1Time,
+            Assert.AreEqual(-1.0, sector1Time,
                 $"Sector 1 should have no time (glitch filtered), got {sector1Time}");
         }
 
@@ -170,7 +170,7 @@ namespace User.PluginMiniSectors.Tests
 
             // Final sector (12) should NOT be recorded due to short time
             double sector12Time = _engine.GetLastLapSectorTime(12);
-            Assert.AreEqual(0.0, sector12Time,
+            Assert.AreEqual(-1.0, sector12Time,
                 $"Final sector should not be recorded (< 0.5s), got {sector12Time}");
         }
 
@@ -216,8 +216,8 @@ namespace User.PluginMiniSectors.Tests
 
             // Current lap sector 12 should NOT have a tiny time
             double currentSector12 = _engine.GetCurrentLapSectorTime(12);
-            Assert.AreEqual(0.0, currentSector12,
-                $"Current lap sector 12 should be 0 (no backward transitions), got {currentSector12}");
+            Assert.AreEqual(-1.0, currentSector12,
+                $"Current lap sector 12 should be -1 (no backward transitions), got {currentSector12}");
         }
     }
 }
