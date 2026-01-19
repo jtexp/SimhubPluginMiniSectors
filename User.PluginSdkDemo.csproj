@@ -107,6 +107,7 @@
     <Compile Include="DataPluginMiniSectors.cs" />
     <Compile Include="DataPluginDemoSettings.cs" />
     <Compile Include="TrackData.cs" />
+    <Compile Include="SectorTimingEngine.cs" />
     <Compile Include="DemoDialogWindow.xaml.cs">
       <DependentUpon>DemoDialogWindow.xaml</DependentUpon>
     </Compile>

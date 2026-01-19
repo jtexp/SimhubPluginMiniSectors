@@ -22,20 +22,6 @@ namespace User.PluginMiniSectors
     internal static class TrackData
     {
         /// <summary>
-        /// Determines whether the session best should be updated for a sector.
-        /// </summary>
-        /// <param name="sectorTime">The completed sector time in seconds</param>
-        /// <param name="currentBest">The current session best (-1 if unset)</param>
-        /// <param name="isLapValid">Whether the lap is valid (no cuts, etc.)</param>
-        /// <returns>True if the sector time should become the new session best</returns>
-        public static bool ShouldUpdateSessionBest(double sectorTime, double currentBest, bool isLapValid)
-        {
-            if (!isLapValid) return false;
-            if (sectorTime <= 0) return false;
-            return currentBest < 0 || sectorTime < currentBest;
-        }
-
-        /// <summary>
         /// Mapping: TrackId -> ordered list of TrackPositionPercent ranges -> corner/section label.
         /// Ordering matters: first match wins.
         /// </summary>
