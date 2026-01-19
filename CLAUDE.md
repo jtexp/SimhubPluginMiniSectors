@@ -8,14 +8,20 @@ SimHub plugin that creates mini sectors data for sim racing. Tracks timing per c
 
 ## Build Commands
 
-**Prerequisites:** Set the `SIMHUB_INSTALL_PATH` environment variable to your SimHub installation directory (e.g., `C:\Program Files (x86)\SimHub\`).
+**Prerequisites:** Set the `SIMHUB_INSTALL_PATH` Windows user environment variable to your SimHub installation directory (e.g., `C:\Program Files (x86)\SimHub\`).
 
 ```bash
-# Build (uses MSBuild, targets .NET Framework 4.8, x86)
-msbuild User.PluginSdkDemo.csproj /p:Configuration=Debug
+# Build from WSL (recommended)
+./build.sh
 
-# The post-build event automatically copies output to SimHub install directory
+# Build from WSL with Release config
+./build.sh Release
+
+# Build from Windows command line
+msbuild User.PluginSdkDemo.csproj /p:Configuration=Debug
 ```
+
+**Note:** Close SimHub before building - the post-build copy will fail if SimHub has the DLLs locked.
 
 **Debug:** Set debug target to SimHub's main exe (`SimHubWPF.exe`).
 
@@ -25,10 +31,13 @@ msbuild User.PluginSdkDemo.csproj /p:Configuration=Debug
 `DataPluginMiniSectors.cs` - Main plugin implementing `IPlugin`, `IDataPlugin`, `IWPFSettingsV2`:
 - `DataUpdate()` - Called each telemetry frame; updates turn/sector detection and timing
 - `Init()` - Registers properties, actions, and events with SimHub
-- `TrackTurnMap` - Static dictionary mapping track IDs to corner ranges (TrackPositionPercent boundaries)
+
+### Track Data
+`TrackData.cs` - Static track corner definitions:
+- `RangeLabel` struct - Defines a track section with start/end TrackPositionPercent and label name
+- `TrackTurnMap` - Static dictionary mapping track IDs to corner ranges
 
 ### Key Concepts
-- **RangeLabel struct** - Defines a track section with start/end TrackPositionPercent and label name
 - **Sector timing** - Uses corner end boundaries to define sector splits; accumulates time between boundaries
 - **Lap wrap detection** - `IsLapWrap()` detects when TrackPositionPercent wraps from ~1.0 to ~0.0
 
@@ -58,6 +67,6 @@ NuGet: `System.Data.SQLite` (Stub.System.Data.SQLite.Core.NetFramework 1.0.119.0
 
 ## Adding New Tracks
 
-Add entries to the `TrackTurnMap` dictionary in `DataPluginMiniSectors.cs`. Each track needs:
+Add entries to the `TrackTurnMap` dictionary in `TrackData.cs`. Each track needs:
 1. A key matching the `TrackName` from game telemetry (case-insensitive)
 2. An array of `RangeLabel` with TrackPositionPercent start/end values and corner names
