@@ -9,6 +9,7 @@ namespace User.PluginMiniSectors
         // --------------------------------------------------------------------
 
         public const int MaxSectors = 15;
+        public const double NoData = -1.0;
 
         // --------------------------------------------------------------------
         // Public read-only properties
@@ -19,8 +20,8 @@ namespace User.PluginMiniSectors
         public int SectorCount { get; private set; } = 0;
         public string TrackId { get; private set; } = "";
         public double TrackPositionPercent { get; private set; } = 0.0;
-        public double CurrentSectorTime { get; private set; } = -1.0;
-        public double LastCompletedSectorTime { get; private set; } = -1.0;
+        public double CurrentSectorTime { get; private set; } = NoData;
+        public double LastCompletedSectorTime { get; private set; } = NoData;
         public int LastCompletedSectorNumber { get; private set; } = 0;
 
         // --------------------------------------------------------------------
@@ -54,11 +55,11 @@ namespace User.PluginMiniSectors
         {
             _repository = repository;
 
-            // Initialize all-time bests to -1 (unset)
-            for (int i = 0; i < _allTimeBestSectorTimesSec.Length; i++)
-            {
-                _allTimeBestSectorTimesSec[i] = -1.0;
-            }
+            // Initialize all arrays to NoData (unset)
+            InitializeArrayToUnset(_currentLapSectorTimesSec);
+            InitializeArrayToUnset(_lastLapSectorTimesSec);
+            InitializeArrayToUnset(_sessionBestSectorTimesSec);
+            InitializeArrayToUnset(_allTimeBestSectorTimesSec);
         }
 
         // --------------------------------------------------------------------
@@ -67,25 +68,25 @@ namespace User.PluginMiniSectors
 
         public double GetCurrentLapSectorTime(int sector)
         {
-            if (sector < 1 || sector > MaxSectors) return -1.0;
+            if (sector < 1 || sector > MaxSectors) return NoData;
             return _currentLapSectorTimesSec[sector];
         }
 
         public double GetLastLapSectorTime(int sector)
         {
-            if (sector < 1 || sector > MaxSectors) return -1.0;
+            if (sector < 1 || sector > MaxSectors) return NoData;
             return _lastLapSectorTimesSec[sector];
         }
 
         public double GetSessionBestSectorTime(int sector)
         {
-            if (sector < 1 || sector > MaxSectors) return -1.0;
+            if (sector < 1 || sector > MaxSectors) return NoData;
             return _sessionBestSectorTimesSec[sector];
         }
 
         public double GetAllTimeBestSectorTime(int sector)
         {
-            if (sector < 1 || sector > MaxSectors) return -1.0;
+            if (sector < 1 || sector > MaxSectors) return NoData;
             return _allTimeBestSectorTimesSec[sector];
         }
 
@@ -188,7 +189,7 @@ namespace User.PluginMiniSectors
         private static void InitializeArrayToUnset(double[] array)
         {
             for (int i = 0; i < array.Length; i++)
-                array[i] = -1.0;
+                array[i] = NoData;
         }
 
         // --------------------------------------------------------------------
@@ -202,8 +203,8 @@ namespace User.PluginMiniSectors
             SectorCount = 0;
             TrackId = "";
             TrackPositionPercent = 0.0;
-            CurrentSectorTime = -1.0;
-            LastCompletedSectorTime = -1.0;
+            CurrentSectorTime = NoData;
+            LastCompletedSectorTime = NoData;
             LastCompletedSectorNumber = 0;
 
             ResetTimingStateForNewSessionOrTrack();
@@ -211,25 +212,15 @@ namespace User.PluginMiniSectors
 
         private void ResetTimingStateForNewSessionOrTrack()
         {
-            CurrentSectorTime = -1.0;
-            LastCompletedSectorTime = -1.0;
+            CurrentSectorTime = NoData;
+            LastCompletedSectorTime = NoData;
             _prevSectorNumber = 0;
             _prevTp = 0.0;
 
             InitializeArrayToUnset(_currentLapSectorTimesSec);
             InitializeArrayToUnset(_lastLapSectorTimesSec);
-
-            // Initialize session bests to -1 (unset)
-            for (int i = 0; i < _sessionBestSectorTimesSec.Length; i++)
-            {
-                _sessionBestSectorTimesSec[i] = -1.0;
-            }
-
-            // Initialize all-time bests to -1 (unset) - will be loaded from DB on track change
-            for (int i = 0; i < _allTimeBestSectorTimesSec.Length; i++)
-            {
-                _allTimeBestSectorTimesSec[i] = -1.0;
-            }
+            InitializeArrayToUnset(_sessionBestSectorTimesSec);
+            InitializeArrayToUnset(_allTimeBestSectorTimesSec);
 
             _sectorStartLapTimeSec = 0.0;
             _prevLapTimeSec = 0.0;
@@ -243,8 +234,8 @@ namespace User.PluginMiniSectors
             // Reset current lap times
             InitializeArrayToUnset(_currentLapSectorTimesSec);
 
-            CurrentSectorTime = -1.0;
-            LastCompletedSectorTime = -1.0;
+            CurrentSectorTime = NoData;
+            LastCompletedSectorTime = NoData;
 
             // After lap wrap, we will re-seed sector state on next update.
             _prevSectorNumber = 0;
