@@ -97,20 +97,20 @@ Add entries to the `TrackTurnMap` dictionary in `TrackData.cs`. Each track needs
 
 ## GitHub Actions
 
-To check CI build status, use a polling loop instead of a single sleep:
+Monitor build status with the `check-build.sh` script:
 
 ```bash
-# Poll every 5 seconds until build completes
-for i in {1..60}; do
-  status=$(gh run list --limit 1 --json status --jq '.[0].status')
-  echo "Build status: $status"
-  if [ "$status" = "completed" ]; then
-    gh run list --limit 1
-    break
-  fi
-  sleep 5
-done
+# Monitor the latest build (in-place updates with step timing)
+./check-build.sh
+
+# Monitor a specific run
+./check-build.sh <run-id>
 ```
+
+The script shows real-time status with:
+- Current job and step name
+- Actual step duration from GitHub timestamps
+- Color-coded status (yellow=in_progress, green=success, red=failure)
 
 To view failed build logs:
 ```bash
