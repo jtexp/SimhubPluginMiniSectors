@@ -10,7 +10,7 @@ namespace User.PluginMiniSectors
     [PluginName("Minisectors")]
     public class DataPluginMiniSectors : IPlugin, IDataPlugin, IWPFSettingsV2
     {
-        public DataPluginDemoSettings Settings;
+        public PluginSettings Settings;
 
         /// <summary>
         /// Instance of the current plugin manager
@@ -84,14 +84,14 @@ namespace User.PluginMiniSectors
 
         public System.Windows.Controls.Control GetWPFSettingsControl(PluginManager pluginManager)
         {
-            return new SettingsControlDemo(this);
+            return new SettingsControl(this);
         }
 
         public void Init(PluginManager pluginManager)
         {
             SimHub.Logging.Current.Info("Starting plugin");
 
-            Settings = this.ReadCommonSettings<DataPluginDemoSettings>("GeneralSettings", () => new DataPluginDemoSettings());
+            Settings = this.ReadCommonSettings<PluginSettings>("GeneralSettings", () => new PluginSettings());
 
             // Initialize the repository (creates tables if needed)
             _repository.Initialize();

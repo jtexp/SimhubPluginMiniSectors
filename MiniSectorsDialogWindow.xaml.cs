@@ -17,11 +17,11 @@ using System.Windows.Shapes;
 namespace User.PluginMiniSectors
 {
     /// <summary>
-    /// Logique d'interaction pour DemoDialogWindow.xaml
+    /// Logique d'interaction pour MiniSectorsDialogWindow.xaml
     /// </summary>
-    public partial class DemoDialogWindow : SHDialogContentBase
+    public partial class MiniSectorsDialogWindow : SHDialogContentBase
     {
-        public DemoDialogWindow()
+        public MiniSectorsDialogWindow()
         {
             InitializeComponent();
             ShowOk = true;

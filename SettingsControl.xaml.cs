@@ -4,18 +4,18 @@ using System.Windows.Controls;
 namespace User.PluginMiniSectors
 {
     /// <summary>
-    /// Logique d'interaction pour SettingsControlDemo.xaml
+    /// Logique d'interaction pour SettingsControl.xaml
     /// </summary>
-    public partial class SettingsControlDemo : UserControl
+    public partial class SettingsControl : UserControl
     {
         public DataPluginMiniSectors Plugin { get; }
 
-        public SettingsControlDemo()
+        public SettingsControl()
         {
             InitializeComponent();
         }
 
-        public SettingsControlDemo(DataPluginMiniSectors plugin) : this()
+        public SettingsControl(DataPluginMiniSectors plugin) : this()
         {
             this.Plugin = plugin;
         }
@@ -27,16 +27,16 @@ namespace User.PluginMiniSectors
             await SHMessageBox.Show(res.ToString());
         }
 
-        private void DemoWindow_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void MiniSectorsWindow_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var window = new DemoWindow();
+            var window = new MiniSectorsWindow();
 
             window.Show();
         }
 
-        private async void DemodialogWindow_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void MiniSectorsDialogWindow_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var dialogWindow = new DemoDialogWindow();
+            var dialogWindow = new MiniSectorsDialogWindow();
 
             var res = await dialogWindow.ShowDialogWindowAsync(this);
 

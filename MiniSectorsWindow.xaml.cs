@@ -17,11 +17,11 @@ using System.Windows.Shapes;
 namespace User.PluginMiniSectors
 {
     /// <summary>
-    /// Logique d'interaction pour DemoWindow.xaml
+    /// Logique d'interaction pour MiniSectorsWindow.xaml
     /// </summary>
-    public partial class DemoWindow : SHMetroWindow
+    public partial class MiniSectorsWindow : SHMetroWindow
     {
-        public DemoWindow()
+        public MiniSectorsWindow()
         {
             InitializeComponent();
         }

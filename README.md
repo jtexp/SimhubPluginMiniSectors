@@ -73,7 +73,7 @@ Use these properties in your SimHub dashboards with the prefix `[Minisectors]`:
 Set the `SIMHUB_INSTALL_PATH` environment variable to your SimHub installation directory, then:
 
 ```bash
-msbuild User.PluginSdkDemo.csproj /p:Configuration=Debug
+msbuild User.PluginMiniSectors.csproj /p:Configuration=Debug
 ```
 
 The post-build event automatically copies the output to SimHub.

@@ -49,9 +49,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\User.PluginSdkDemo.csproj">
+    <ProjectReference Include="..\User.PluginMiniSectors.csproj">
       <Project>{833040C9-FE5E-4CCF-B21D-71979E049B6B}</Project>
-      <Name>User.PluginSdkDemo</Name>
+      <Name>User.PluginMiniSectors</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

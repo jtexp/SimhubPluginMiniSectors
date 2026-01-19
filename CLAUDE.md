@@ -18,7 +18,7 @@ SimHub plugin that creates mini sectors data for sim racing. Tracks timing per c
 ./build.sh Release
 
 # Build from Windows command line
-msbuild User.PluginSdkDemo.csproj /p:Configuration=Debug
+msbuild User.PluginMiniSectors.csproj /p:Configuration=Debug
 ```
 
 **Note:** Close SimHub before building - the post-build copy will fail if SimHub has the DLLs locked.
@@ -51,9 +51,9 @@ msbuild User.PluginSdkDemo.csproj /p:Configuration=Debug
 - `LastLapSectorTime_01` through `LastLapSectorTime_60` - Per-sector times for previous lap
 
 ### Settings & UI
-- `DataPluginDemoSettings.cs` - Serializable settings (JSON.NET compatible)
-- `SettingsControlDemo.xaml/.cs` - WPF settings control displayed in SimHub
-- `DemoWindow.xaml/.cs`, `DemoDialogWindow.xaml/.cs` - Example windows/dialogs
+- `PluginSettings.cs` - Serializable settings (JSON.NET compatible)
+- `SettingsControl.xaml/.cs` - WPF settings control displayed in SimHub
+- `MiniSectorsWindow.xaml/.cs`, `MiniSectorsDialogWindow.xaml/.cs` - Example windows/dialogs
 
 ### Data Storage
 SQLite database stored at `%USERPROFILE%\Documents\SimHub\PluginsData\User.PluginMiniSectors\MiniSectors.sqlite`.
