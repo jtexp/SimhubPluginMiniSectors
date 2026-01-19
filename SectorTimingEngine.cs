@@ -34,8 +34,8 @@ namespace User.PluginMiniSectors
         private int _prevSectorNumber = 0;
         private double _prevTp = 0.0;
 
-        private bool _hasLastUpdate = false;
-        private DateTime _lastUpdateUtc = DateTime.MinValue;
+        private double _sectorStartLapTimeSec = 0.0;
+        private double _prevLapTimeSec = 0.0;
 
         private readonly ISectorBestRepository _repository;
         private TrackConditions _currentConditions;
@@ -223,8 +223,8 @@ namespace User.PluginMiniSectors
                 _allTimeBestSectorTimesSec[i] = -1.0;
             }
 
-            _hasLastUpdate = false;
-            _lastUpdateUtc = DateTime.MinValue;
+            _sectorStartLapTimeSec = 0.0;
+            _prevLapTimeSec = 0.0;
         }
 
         private void FinalizeLapToLastLap()
@@ -242,7 +242,7 @@ namespace User.PluginMiniSectors
             _prevSectorNumber = 0;
         }
 
-        public void Update(string trackId, double tp, DateTime nowUtc, bool isLapValid)
+        public void Update(string trackId, double tp, double currentLapTimeSec, bool isLapValid)
         {
             // Track change detection (track id can sometimes appear late; be tolerant)
             bool trackChanged = !string.Equals(TrackId ?? "", trackId ?? "", StringComparison.OrdinalIgnoreCase);
@@ -276,34 +276,24 @@ namespace User.PluginMiniSectors
             SectorCount = sectorCount;
             CurrentSectorNumber = sectorNumber;
 
-            // Update dt
-            double dtSec = 0.0;
-            if (_hasLastUpdate)
-            {
-                dtSec = (nowUtc - _lastUpdateUtc).TotalSeconds;
-
-                // Guard: dt can spike when game pauses / plugin stalls.
-                // Clamp to something reasonable to avoid polluting sector times.
-                if (dtSec < 0) dtSec = 0;
-                if (dtSec > 1.0) dtSec = 1.0; // you can relax this if you prefer
-            }
-            _lastUpdateUtc = nowUtc;
-            _hasLastUpdate = true;
-
-            // If we cannot map a sector, do not accumulate (prevents garbage times)
+            // If we cannot map a sector, do not update timing (prevents garbage times)
             if (sectorNumber <= 0)
             {
                 _prevTp = tp;
+                _prevLapTimeSec = currentLapTimeSec;
                 return;
             }
 
-            // Lap wrap detection
-            bool lapWrapped = IsLapWrap(_prevTp, tp) || (_prevSectorNumber > 0 && sectorNumber < _prevSectorNumber);
+            // Lap wrap detection: lap time reset or track position wrap
+            bool lapTimeReset = currentLapTimeSec < _prevLapTimeSec - 1.0; // Allow small jitter
+            bool lapWrapped = IsLapWrap(_prevTp, tp) || lapTimeReset || (_prevSectorNumber > 0 && sectorNumber < _prevSectorNumber);
 
             if (lapWrapped)
             {
                 FinalizeLapToLastLap();
+                _sectorStartLapTimeSec = currentLapTimeSec;
                 _prevTp = tp;
+                _prevLapTimeSec = currentLapTimeSec;
                 _prevSectorNumber = sectorNumber;
                 return;
             }
@@ -311,45 +301,47 @@ namespace User.PluginMiniSectors
             // Sector transition detection
             if (_prevSectorNumber > 0 && sectorNumber != _prevSectorNumber)
             {
-                // Finalize the previous sector time (store elapsed)
+                // Finalize the previous sector time
                 int prevSector = _prevSectorNumber;
+                double completedSectorTime = currentLapTimeSec - _sectorStartLapTimeSec;
 
-                if (prevSector >= 1 && prevSector <= MaxSectors)
+                if (prevSector >= 1 && prevSector <= MaxSectors && completedSectorTime > 0)
                 {
-                    _currentLapSectorTimesSec[prevSector] = CurrentSectorTime;
+                    _currentLapSectorTimesSec[prevSector] = completedSectorTime;
 
                     // Update session best if applicable
-                    if (ShouldUpdateSessionBest(CurrentSectorTime, _sessionBestSectorTimesSec[prevSector], isLapValid))
+                    if (ShouldUpdateSessionBest(completedSectorTime, _sessionBestSectorTimesSec[prevSector], isLapValid))
                     {
-                        _sessionBestSectorTimesSec[prevSector] = CurrentSectorTime;
+                        _sessionBestSectorTimesSec[prevSector] = completedSectorTime;
 
                         // Check if this also beats all-time best, and persist if so
                         bool beatsAllTimeBest = _allTimeBestSectorTimesSec[prevSector] < 0 ||
-                                                CurrentSectorTime < _allTimeBestSectorTimesSec[prevSector];
+                                                completedSectorTime < _allTimeBestSectorTimesSec[prevSector];
                         if (beatsAllTimeBest)
                         {
-                            _allTimeBestSectorTimesSec[prevSector] = CurrentSectorTime;
+                            _allTimeBestSectorTimesSec[prevSector] = completedSectorTime;
 
                             // Persist to repository
                             if (_repository != null && !string.IsNullOrWhiteSpace(_currentCarModel))
                             {
-                                _repository.SaveSectorBest(TrackId, prevSector, CurrentSectorTime,
+                                _repository.SaveSectorBest(TrackId, prevSector, completedSectorTime,
                                                            _currentCarModel, _currentConditions);
                             }
                         }
                     }
+
+                    LastCompletedSectorTime = completedSectorTime;
                 }
 
-                LastCompletedSectorTime = CurrentSectorTime;
-
-                // Reset accumulator for new sector
-                CurrentSectorTime = 0.0;
+                // Start timing new sector from current lap time
+                _sectorStartLapTimeSec = currentLapTimeSec;
             }
 
-            // Accumulate for current sector
-            CurrentSectorTime += dtSec;
+            // Calculate current sector time from lap time
+            CurrentSectorTime = currentLapTimeSec - _sectorStartLapTimeSec;
 
             _prevTp = tp;
+            _prevLapTimeSec = currentLapTimeSec;
             _prevSectorNumber = sectorNumber;
         }
     }

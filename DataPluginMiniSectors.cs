@@ -55,6 +55,7 @@ namespace User.PluginMiniSectors
             string trackId = TryGetTrackId(data);
             double tp = TryGetTrackPositionPercent(data);
             bool isLapValid = TryGetIsLapValid(data);
+            double currentLapTimeSec = TryGetCurrentLapTime(data);
 
             // Extract track conditions
             _conditions.CarModel = TryGetCarModel(data);
@@ -64,7 +65,7 @@ namespace User.PluginMiniSectors
             _conditions.GripLevel = TryGetGripLevel(data);
 
             _engine.SetConditions(_conditions);
-            _engine.Update(trackId, tp, DateTime.UtcNow, isLapValid);
+            _engine.Update(trackId, tp, currentLapTimeSec, isLapValid);
 
             // Existing sample logic retained (and corrected)
             if (data.OldData != null)
@@ -204,6 +205,18 @@ namespace User.PluginMiniSectors
             catch
             {
                 return false;
+            }
+        }
+
+        private static double TryGetCurrentLapTime(in GameData data)
+        {
+            try
+            {
+                return data.NewData.CurrentLapTime.TotalSeconds;
+            }
+            catch
+            {
+                return 0.0;
             }
         }
 
