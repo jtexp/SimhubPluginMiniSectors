@@ -29,7 +29,7 @@ jobs:
         run: echo "SIMHUB_INSTALL_PATH=C:\SimHub\" >> $env:GITHUB_ENV
 
       - name: Restore NuGet packages
-        run: nuget restore User.PluginSdkDemo.csproj
+        run: nuget restore User.PluginSdkDemo.csproj -PackagesDirectory packages
 
       - name: Build
         run: msbuild User.PluginSdkDemo.csproj /p:Configuration=Release /p:PostBuildEvent=
