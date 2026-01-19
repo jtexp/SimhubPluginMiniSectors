@@ -1,8 +1,6 @@
 using GameReaderCommon;
 using SimHub.Plugins;
 using System;
-using System.Data.SQLite;
-using System.IO;
 using System.Windows.Media;
 
 namespace User.PluginMiniSectors
@@ -30,10 +28,18 @@ namespace User.PluginMiniSectors
         public string LeftMenuTitle => "Minisectors";
 
         // --------------------------------------------------------------------
-        // Sector timing engine
+        // Repository and engine
         // --------------------------------------------------------------------
 
-        private readonly SectorTimingEngine _engine = new SectorTimingEngine();
+        private readonly ISectorBestRepository _repository;
+        private readonly SectorTimingEngine _engine;
+        private readonly TrackConditions _conditions = new TrackConditions();
+
+        public DataPluginMiniSectors()
+        {
+            _repository = new SectorBestRepository();
+            _engine = new SectorTimingEngine(_repository);
+        }
 
         // --------------------------------------------------------------------
         // SimHub Plugin Methods
@@ -46,11 +52,18 @@ namespace User.PluginMiniSectors
                 _engine.Reset();
                 return;
             }
-
             string trackId = TryGetTrackId(data);
             double tp = TryGetTrackPositionPercent(data);
             bool isLapValid = TryGetIsLapValid(data);
 
+            // Extract track conditions
+            _conditions.CarModel = TryGetCarModel(data);
+            _conditions.WeatherType = TryGetWeatherType(data);
+            _conditions.TrackTempCelsius = TryGetTrackTemp(data);
+            _conditions.AirTempCelsius = TryGetAirTemp(data);
+            _conditions.GripLevel = TryGetGripLevel(data);
+
+            _engine.SetConditions(_conditions);
             _engine.Update(trackId, tp, DateTime.UtcNow, isLapValid);
 
             // Existing sample logic retained (and corrected)
@@ -79,7 +92,9 @@ namespace User.PluginMiniSectors
 
             Settings = this.ReadCommonSettings<DataPluginDemoSettings>("GeneralSettings", () => new DataPluginDemoSettings());
 
-
+            // Initialize the repository (creates tables if needed)
+            _repository.Initialize();
+            SimHub.Logging.Current.Info("SQLite repository initialized");
 
             // Existing sample property
             this.AttachDelegate(name: "CurrentDateTime", valueProvider: () => DateTime.Now);
@@ -88,6 +103,9 @@ namespace User.PluginMiniSectors
             this.AttachDelegate(name: "CurrentTurn", valueProvider: () => _engine.CurrentTurn);
             this.AttachDelegate(name: "TrackId", valueProvider: () => _engine.TrackId);
             this.AttachDelegate(name: "TrackPositionPercent", valueProvider: () => _engine.TrackPositionPercent);
+
+            // Car model property
+            this.AttachDelegate(name: "CurrentCarModel", valueProvider: () => _conditions.CarModel);
 
             // Sector index properties
             this.AttachDelegate(name: "CurrentSectorNumber", valueProvider: () => _engine.CurrentSectorNumber);
@@ -113,6 +131,10 @@ namespace User.PluginMiniSectors
                 this.AttachDelegate(
                     name: $"SessionBestSectorTime_{sectorIndex:00}",
                     valueProvider: () => _engine.GetSessionBestSectorTime(sectorIndex));
+
+                this.AttachDelegate(
+                    name: $"AllTimeBestSectorTime_{sectorIndex:00}",
+                    valueProvider: () => _engine.GetAllTimeBestSectorTime(sectorIndex));
             }
 
             // Declare an event
@@ -141,33 +163,8 @@ namespace User.PluginMiniSectors
                 inputReleased: (a, b) => { /* released */ }
             );
 
-
-
-            var folder = Path.Combine(
-    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-    "SimHub", "PluginsData", "User.PluginMiniSectors");
-
-            Directory.CreateDirectory(folder);
-            var dbPath = Path.Combine(folder, "MiniSectors.sqlite");
-
-            using (var conn = new SQLiteConnection($"Data Source={dbPath};Version=3;"))
-            {
-                conn.Open();
-                using (var cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, v TEXT);";
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            SimHub.Logging.Current.Info("SQLite initialized OK");
-
-
             // Initialize runtime state
             _engine.Reset();
-
-
-
         }
 
         // --------------------------------------------------------------------
@@ -207,6 +204,70 @@ namespace User.PluginMiniSectors
             catch
             {
                 return false;
+            }
+        }
+
+        private static string TryGetCarModel(in GameData data)
+        {
+            try
+            {
+                return data.NewData.CarModel ?? "";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private static string TryGetWeatherType(in GameData data)
+        {
+            try
+            {
+                // RoadWetness: 0 = dry, higher values = wetter
+                return "VeryWet";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private static double TryGetTrackTemp(in GameData data)
+        {
+            try
+            {
+                return data.NewData.RoadTemperature;
+            }
+            catch
+            {
+                return 0.0;
+            }
+        }
+
+        private static double TryGetAirTemp(in GameData data)
+        {
+            try
+            {
+                return data.NewData.AirTemperature;
+            }
+            catch
+            {
+                return 0.0;
+            }
+        }
+
+        private static string TryGetGripLevel(in GameData data)
+        {
+            try
+            {
+                // SimHub doesn't have a direct grip level property for all games.
+                // For ACC, you might access raw data. For now, we'll return empty
+                // and this can be enhanced later with game-specific logic.
+                return "";
+            }
+            catch
+            {
+                return "";
             }
         }
     }

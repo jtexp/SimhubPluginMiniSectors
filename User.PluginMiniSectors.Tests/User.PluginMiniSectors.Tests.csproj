@@ -34,12 +34,15 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageReference Include="Stub.System.Data.SQLite.Core.NetFramework" Version="1.0.119.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SectorBestRepositoryTests.cs" />
     <Compile Include="SessionBestTests.cs" />
     <Compile Include="TrackDataTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

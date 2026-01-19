@@ -29,12 +29,36 @@ namespace User.PluginMiniSectors
         private readonly double[] _currentLapSectorTimesSec = new double[MaxSectors + 1]; // index 1..MaxSectors
         private readonly double[] _lastLapSectorTimesSec = new double[MaxSectors + 1];    // index 1..MaxSectors
         private readonly double[] _sessionBestSectorTimesSec = new double[MaxSectors + 1]; // index 1..MaxSectors, -1 = unset
+        private readonly double[] _allTimeBestSectorTimesSec = new double[MaxSectors + 1]; // index 1..MaxSectors, -1 = unset
 
         private int _prevSectorNumber = 0;
         private double _prevTp = 0.0;
 
         private bool _hasLastUpdate = false;
         private DateTime _lastUpdateUtc = DateTime.MinValue;
+
+        private readonly ISectorBestRepository _repository;
+        private TrackConditions _currentConditions;
+        private string _currentCarModel = "";
+
+        // --------------------------------------------------------------------
+        // Constructor
+        // --------------------------------------------------------------------
+
+        public SectorTimingEngine() : this(null)
+        {
+        }
+
+        public SectorTimingEngine(ISectorBestRepository repository)
+        {
+            _repository = repository;
+
+            // Initialize all-time bests to -1 (unset)
+            for (int i = 0; i < _allTimeBestSectorTimesSec.Length; i++)
+            {
+                _allTimeBestSectorTimesSec[i] = -1.0;
+            }
+        }
 
         // --------------------------------------------------------------------
         // Indexed getters
@@ -56,6 +80,25 @@ namespace User.PluginMiniSectors
         {
             if (sector < 1 || sector > MaxSectors) return -1.0;
             return _sessionBestSectorTimesSec[sector];
+        }
+
+        public double GetAllTimeBestSectorTime(int sector)
+        {
+            if (sector < 1 || sector > MaxSectors) return -1.0;
+            return _allTimeBestSectorTimesSec[sector];
+        }
+
+        // --------------------------------------------------------------------
+        // Condition setter
+        // --------------------------------------------------------------------
+
+        public void SetConditions(TrackConditions conditions)
+        {
+            _currentConditions = conditions;
+            if (conditions != null)
+            {
+                _currentCarModel = conditions.CarModel ?? "";
+            }
         }
 
         // --------------------------------------------------------------------
@@ -174,6 +217,12 @@ namespace User.PluginMiniSectors
                 _sessionBestSectorTimesSec[i] = -1.0;
             }
 
+            // Initialize all-time bests to -1 (unset) - will be loaded from DB on track change
+            for (int i = 0; i < _allTimeBestSectorTimesSec.Length; i++)
+            {
+                _allTimeBestSectorTimesSec[i] = -1.0;
+            }
+
             _hasLastUpdate = false;
             _lastUpdateUtc = DateTime.MinValue;
         }
@@ -197,10 +246,25 @@ namespace User.PluginMiniSectors
         {
             // Track change detection (track id can sometimes appear late; be tolerant)
             bool trackChanged = !string.Equals(TrackId ?? "", trackId ?? "", StringComparison.OrdinalIgnoreCase);
-            if (trackChanged && !string.IsNullOrWhiteSpace(trackId))
+            bool carModelChanged = _currentConditions != null &&
+                                   !string.Equals(_currentCarModel ?? "", _currentConditions.CarModel ?? "", StringComparison.OrdinalIgnoreCase);
+
+            if ((trackChanged || carModelChanged) && !string.IsNullOrWhiteSpace(trackId))
             {
-                // new track => reset timing and lap storage
+                // new track or car => reset timing and lap storage
                 ResetTimingStateForNewSessionOrTrack();
+
+                // Update current car model
+                if (_currentConditions != null)
+                {
+                    _currentCarModel = _currentConditions.CarModel ?? "";
+                }
+
+                // Load all-time bests from repository
+                if (_repository != null && !string.IsNullOrWhiteSpace(_currentCarModel))
+                {
+                    _repository.LoadAllTimeBestsForTrack(trackId, _currentCarModel, _allTimeBestSectorTimesSec);
+                }
             }
 
             TrackId = trackId ?? "";
@@ -258,6 +322,21 @@ namespace User.PluginMiniSectors
                     if (ShouldUpdateSessionBest(CurrentSectorTime, _sessionBestSectorTimesSec[prevSector], isLapValid))
                     {
                         _sessionBestSectorTimesSec[prevSector] = CurrentSectorTime;
+
+                        // Check if this also beats all-time best, and persist if so
+                        bool beatsAllTimeBest = _allTimeBestSectorTimesSec[prevSector] < 0 ||
+                                                CurrentSectorTime < _allTimeBestSectorTimesSec[prevSector];
+                        if (beatsAllTimeBest)
+                        {
+                            _allTimeBestSectorTimesSec[prevSector] = CurrentSectorTime;
+
+                            // Persist to repository
+                            if (_repository != null && !string.IsNullOrWhiteSpace(_currentCarModel))
+                            {
+                                _repository.SaveSectorBest(TrackId, prevSector, CurrentSectorTime,
+                                                           _currentCarModel, _currentConditions);
+                            }
+                        }
                     }
                 }
 
