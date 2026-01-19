@@ -115,6 +115,7 @@ namespace User.PluginMiniSectors
             // Sector timing properties
             this.AttachDelegate(name: "CurrentSectorTime", valueProvider: () => _engine.CurrentSectorTime);
             this.AttachDelegate(name: "LastCompletedSectorTime", valueProvider: () => _engine.LastCompletedSectorTime);
+            this.AttachDelegate(name: "LastCompletedSectorNumber", valueProvider: () => _engine.LastCompletedSectorNumber);
 
             // Expose per-sector times as properties (fixed list so you can reference them in SimHub formulas)
             for (int i = 1; i <= SectorTimingEngine.MaxSectors; i++)

@@ -21,6 +21,7 @@ namespace User.PluginMiniSectors
         public double TrackPositionPercent { get; private set; } = 0.0;
         public double CurrentSectorTime { get; private set; } = 0.0;
         public double LastCompletedSectorTime { get; private set; } = 0.0;
+        public int LastCompletedSectorNumber { get; private set; } = 0;
 
         // --------------------------------------------------------------------
         // Internal state
@@ -197,6 +198,7 @@ namespace User.PluginMiniSectors
             TrackPositionPercent = 0.0;
             CurrentSectorTime = 0.0;
             LastCompletedSectorTime = 0.0;
+            LastCompletedSectorNumber = 0;
 
             ResetTimingStateForNewSessionOrTrack();
         }
@@ -328,6 +330,7 @@ namespace User.PluginMiniSectors
                         }
 
                         LastCompletedSectorTime = finalSectorTime;
+                        LastCompletedSectorNumber = _prevSectorNumber;
                     }
                 }
 
@@ -376,6 +379,7 @@ namespace User.PluginMiniSectors
                     }
 
                     LastCompletedSectorTime = completedSectorTime;
+                    LastCompletedSectorNumber = prevSector;
                 }
 
                 // Start timing new sector from current lap time
