@@ -327,7 +327,15 @@ namespace User.PluginMiniSectors
                                     }
                                     catch (Exception ex)
                                     {
-                                        SimHub.Logging.Current.Error($"Failed to save sector best to database: {ex.Message}");
+                                        // Log error only when running in SimHub context (not in unit tests)
+                                        try
+                                        {
+                                            SimHub.Logging.Current?.Error($"Failed to save sector best to database: {ex.Message}");
+                                        }
+                                        catch
+                                        {
+                                            // Ignore logging errors (e.g., when running in test context without SimHub)
+                                        }
                                     }
                                 }
                             }
@@ -382,7 +390,15 @@ namespace User.PluginMiniSectors
                                 }
                                 catch (Exception ex)
                                 {
-                                    SimHub.Logging.Current.Error($"Failed to save sector best to database: {ex.Message}");
+                                    // Log error only when running in SimHub context (not in unit tests)
+                                    try
+                                    {
+                                        SimHub.Logging.Current?.Error($"Failed to save sector best to database: {ex.Message}");
+                                    }
+                                    catch
+                                    {
+                                        // Ignore logging errors (e.g., when running in test context without SimHub)
+                                    }
                                 }
                             }
                         }
