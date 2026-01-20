@@ -230,18 +230,11 @@ namespace User.PluginMiniSectors
         {
             try
             {
-                // RoadWetness: 0 = dry, higher values = wetter
-                // Using a simple categorization based on road wetness level
-                double roadWetness = data.NewData.RoadWetness;
-
-                if (roadWetness <= 0.0)
-                    return "Dry";
-                else if (roadWetness < 0.3)
-                    return "Damp";
-                else if (roadWetness < 0.7)
-                    return "Wet";
-                else
-                    return "VeryWet";
+                // Weather detection requires game-specific raw data properties
+                // SimHub's StatusDataBase doesn't expose a universal weather property
+                // Future enhancement: Access game-specific raw data for ACC, etc.
+                // For now, returning empty string to indicate data is not available
+                return "";
             }
             catch
             {
