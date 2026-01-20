@@ -67,7 +67,7 @@ namespace User.PluginMiniSectors
             _engine.SetConditions(_conditions);
             _engine.Update(trackId, tp, currentLapTimeSec, isLapValid);
 
-            // Existing sample logic retained (and corrected)
+            // Sample event triggering logic
             if (data.OldData != null)
             {
                 if (data.OldData.SpeedKmh < Settings.SpeedWarningLevel && data.NewData.SpeedKmh >= Settings.SpeedWarningLevel)
@@ -91,7 +91,7 @@ namespace User.PluginMiniSectors
         {
             SimHub.Logging.Current.Info("Starting plugin");
 
-            Settings = this.ReadCommonSettings<PluginSettings>("GeneralSettings", () => new PluginSettings());
+            Settings = this.ReadCommonSettings<PluginSettings>("GeneralSettings", () => new PluginSettings()) ?? new PluginSettings();
 
             // Initialize the repository (creates tables if needed)
             _repository.Initialize();
@@ -157,13 +157,6 @@ namespace User.PluginMiniSectors
                 {
                     Settings.SpeedWarningLevel--;
                 });
-
-            // Declare an input mapping
-            this.AddInputMapping(
-                inputName: "InputPressed",
-                inputPressed: (a, b) => { /* pressed */ },
-                inputReleased: (a, b) => { /* released */ }
-            );
 
             // Initialize runtime state
             _engine.Reset();
@@ -238,7 +231,17 @@ namespace User.PluginMiniSectors
             try
             {
                 // RoadWetness: 0 = dry, higher values = wetter
-                return "VeryWet";
+                // Using a simple categorization based on road wetness level
+                double roadWetness = data.NewData.RoadWetness;
+
+                if (roadWetness <= 0.0)
+                    return "Dry";
+                else if (roadWetness < 0.3)
+                    return "Damp";
+                else if (roadWetness < 0.7)
+                    return "Wet";
+                else
+                    return "VeryWet";
             }
             catch
             {
@@ -274,9 +277,9 @@ namespace User.PluginMiniSectors
         {
             try
             {
-                // SimHub doesn't have a direct grip level property for all games.
-                // For ACC, you might access raw data. For now, we'll return empty
-                // and this can be enhanced later with game-specific logic.
+                // SimHub doesn't expose a direct grip level property across all games.
+                // Game-specific implementations could access raw telemetry data in the future.
+                // For now, returning empty string to indicate data is not available.
                 return "";
             }
             catch
