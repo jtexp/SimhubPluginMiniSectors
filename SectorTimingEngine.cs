@@ -325,17 +325,9 @@ namespace User.PluginMiniSectors
                                         _repository.SaveSectorBest(TrackId, _prevSectorNumber, finalSectorTime,
                                                                    _currentCarModel, _currentConditions);
                                     }
-                                    catch (Exception ex)
+                                    catch
                                     {
-                                        // Log error only when running in SimHub context (not in unit tests)
-                                        try
-                                        {
-                                            SimHub.Logging.Current?.Error($"Failed to save sector best to database: {ex.Message}");
-                                        }
-                                        catch
-                                        {
-                                            // Ignore logging errors (e.g., when running in test context without SimHub)
-                                        }
+                                        // Silently ignore database errors
                                     }
                                 }
                             }
@@ -388,17 +380,9 @@ namespace User.PluginMiniSectors
                                     _repository.SaveSectorBest(TrackId, prevSector, completedSectorTime,
                                                                _currentCarModel, _currentConditions);
                                 }
-                                catch (Exception ex)
+                                catch
                                 {
-                                    // Log error only when running in SimHub context (not in unit tests)
-                                    try
-                                    {
-                                        SimHub.Logging.Current?.Error($"Failed to save sector best to database: {ex.Message}");
-                                    }
-                                    catch
-                                    {
-                                        // Ignore logging errors (e.g., when running in test context without SimHub)
-                                    }
+                                    // Silently ignore database errors
                                 }
                             }
                         }
