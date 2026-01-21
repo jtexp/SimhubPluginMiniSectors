@@ -7,12 +7,14 @@ on:
       - '.github/workflows/nightly.yml'
       - 'CLAUDE.md'
       - 'README.md'
+      - 'ROADMAP.md'
   pull_request:
     branches: [main]
     paths-ignore:
       - '.github/workflows/nightly.yml'
       - 'CLAUDE.md'
       - 'README.md'
+      - 'ROADMAP.md'
 
 jobs:
   build:
