@@ -52,20 +52,36 @@ msbuild User.PluginMiniSectors.csproj /p:Configuration=Debug
 
 ### Settings & UI
 - `PluginSettings.cs` - Serializable settings (JSON.NET compatible)
-- `SettingsControl.xaml/.cs` - WPF settings control displayed in SimHub
+- `SettingsControl.xaml/.cs` - WPF settings control displayed in SimHub (tabbed interface)
+  - **Info tab** - Version info, update checker, about section
+  - **Records tab** - DataGrid showing historical sector best times from SQLite
 - `MiniSectorsWindow.xaml/.cs`, `MiniSectorsDialogWindow.xaml/.cs` - Example windows/dialogs
+
+### Data Models
+- `SectorBestRecord.cs` - Data model for displaying stored sector bests in the Records tab DataGrid
+- `TrackConditions.cs` - Holds weather/temperature data for sector best storage
 
 ### Data Storage
 SQLite database stored at `%USERPROFILE%\Documents\SimHub\PluginsData\User.PluginMiniSectors\MiniSectors.sqlite`.
+
+**Repository Pattern:**
+- `ISectorBestRepository` / `SectorBestRepository` - Interface and implementation for SQLite operations
+- Key methods:
+  - `SaveSectorBest()` - Stores new sector best times (called from game thread)
+  - `GetRecentRecords(limit)` - Returns recent records for UI display (default 500)
+  - `GetAllRecords()` - Returns all records for UI display
+  - `LoadAllTimeBestsForTrack()` - Bulk loads bests for a track/car combo
 
 ## Dependencies
 
 References loaded from `$(SIMHUB_INSTALL_PATH)`:
 - `SimHub.Plugins.dll`, `GameReaderCommon.dll` - Core SimHub plugin SDK
-- `MahApps.Metro.dll` - WPF styling framework
+- `MahApps.Metro.dll` (v1.5.x) - WPF styling framework
 - `log4net.dll` - Logging via `SimHub.Logging.Current`
 
 NuGet: `System.Data.SQLite` (Stub.System.Data.SQLite.Core.NetFramework 1.0.119.0)
+
+**MahApps.Metro Note:** SimHub uses MahApps.Metro 1.5.x which has older style naming conventions. Use `mah:MetroAnimatedSingleRowTabControl` for tabs. Newer style names like `MahApps.Styles.DataGrid` do NOT exist in this version.
 
 ## Testing
 
@@ -80,14 +96,34 @@ powershell.exe -Command "& 'C:\Program Files\Microsoft Visual Studio\18\Communit
 
 Tests cover `RangeLabel` and `TrackTurnMap` functionality. Internal types are exposed via `InternalsVisibleTo` in `Properties/AssemblyInfo.cs`.
 
+**Test Data Generation:**
+```bash
+# Generate 500 fake sector records for UI testing (requires sqlite3 CLI)
+powershell.exe -File scripts/generate-test-data.ps1
+
+# Generate custom count
+powershell.exe -File scripts/generate-test-data.ps1 -RecordCount 2000
+```
+
 ## CI/CD
 
-GitHub Actions workflow: `.github/workflows/build.yml`
+GitHub Actions workflows:
+- `.github/workflows/build.yml` - Builds and tests on every push
+- `.github/workflows/nightly.yml` - Creates nightly release from latest successful build
 
 **SimHub SDK for CI:** The workflow downloads SimHub SDK DLLs from a separate repo since SimHub isn't installed on GitHub runners:
 - Repo: `https://github.com/jtexp/simhub-sdk`
 - Contains only the DLLs needed for compilation (not the full SimHub install)
 - Update this repo when upgrading SimHub versions
+
+**Releasing a Nightly:**
+```bash
+# Trigger nightly release manually
+gh workflow run nightly.yml
+
+# Check status
+gh run list --workflow=nightly.yml --limit=1
+```
 
 ## Adding New Tracks
 
