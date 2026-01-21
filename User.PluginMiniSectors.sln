@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
@@ -6,6 +6,8 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.PluginMiniSectors", "User.PluginMiniSectors.csproj", "{833040C9-FE5E-4CCF-B21D-71979E049B6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.PluginMiniSectors.Tests", "User.PluginMiniSectors.Tests\User.PluginMiniSectors.Tests.csproj", "{B5A3C1F2-6D4E-4A8B-9C2D-1E3F5A6B7C8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniSectorsUpdater", "Updater\MiniSectorsUpdater.csproj", "{D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{B5A3C1F2-6D4E-4A8B-9C2D-1E3F5A6B7C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5A3C1F2-6D4E-4A8B-9C2D-1E3F5A6B7C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5A3C1F2-6D4E-4A8B-9C2D-1E3F5A6B7C8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1E2F3A4-B5C6-7D8E-9F0A-1B2C3D4E5F6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

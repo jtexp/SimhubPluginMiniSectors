@@ -51,3 +51,4 @@ jobs:
           path: |
             bin/Release/User.PluginMiniSectors.dll
             bin/Release/User.PluginMiniSectors.pdb
+            Updater/bin/Release/MiniSectorsUpdater.exe

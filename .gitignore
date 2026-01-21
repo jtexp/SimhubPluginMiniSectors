@@ -51,3 +51,6 @@ Desktop.ini
 
 # Logs
 *.log
+
+# Generated during build
+GitCommit.txt
