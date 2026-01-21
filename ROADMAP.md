@@ -114,13 +114,15 @@ When a lap completes, current lap sector times are cleared and copied to "last l
 
 - **Session Best Sector Times** - `SessionBestSectorTime_01` through `_60` properties
 - **All-Time Best Sector Times (SQLite)** - `AllTimeBestSectorTime_01` through `_60` with database persistence
+- **Condition tracking** - Track temp, air temp, weather, and grip level stored with each sector best
+- **Auto-update** - Check for and install nightly updates from plugin settings
+- **Records tab** - View historical sector bests in a sortable DataGrid
 
 ---
 
 ## Future Ideas
 
 - **Stint tracking** - Best times per stint (resets on pit stop); useful for endurance racing to compare tire degradation
-- **Condition tracking** - Track temp, weather conditions stored with best times
 - **Export/import personal bests** - Share or backup your data
 - **Sector performance trends** - Visualize improvement over time
 - **ACC native sector integration** - Compare mini sectors against ACC's built-in sector data
