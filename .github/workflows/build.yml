@@ -44,11 +44,15 @@ jobs:
       - name: Run tests
         run: vstest.console.exe User.PluginMiniSectors.Tests\bin\Release\User.PluginMiniSectors.Tests.dll
 
+      - name: Stage artifact files
+        run: |
+          New-Item -ItemType Directory -Path artifact -Force
+          Copy-Item bin/Release/User.PluginMiniSectors.dll artifact/
+          Copy-Item bin/Release/User.PluginMiniSectors.pdb artifact/
+          Copy-Item Updater/bin/Release/MiniSectorsUpdater.exe artifact/
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: User.PluginMiniSectors
-          path: |
-            bin/Release/User.PluginMiniSectors.dll
-            bin/Release/User.PluginMiniSectors.pdb
-            Updater/bin/Release/MiniSectorsUpdater.exe
+          path: artifact/*
