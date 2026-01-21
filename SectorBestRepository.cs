@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 
@@ -167,6 +168,95 @@ namespace User.PluginMiniSectors
                     }
                 }
             }
+        }
+
+        public List<SectorBestRecord> GetRecentRecords(int limit = 500)
+        {
+            var records = new List<SectorBestRecord>();
+            try
+            {
+                using (var conn = new SQLiteConnection(_connectionString))
+                {
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            SELECT id, track_id, sector_number, best_time_sec, car_model,
+                                   weather_type, track_temp_celsius, air_temp_celsius,
+                                   grip_level, recorded_at
+                            FROM sector_bests
+                            ORDER BY recorded_at DESC
+                            LIMIT @limit";
+                        cmd.Parameters.AddWithValue("@limit", limit);
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                records.Add(ReadRecord(reader));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SimHub.Logging.Current.Error($"Failed to load records: {ex}");
+                throw;
+            }
+            return records;
+        }
+
+        public List<SectorBestRecord> GetAllRecords()
+        {
+            var records = new List<SectorBestRecord>();
+            try
+            {
+                using (var conn = new SQLiteConnection(_connectionString))
+                {
+                    conn.Open();
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            SELECT id, track_id, sector_number, best_time_sec, car_model,
+                                   weather_type, track_temp_celsius, air_temp_celsius,
+                                   grip_level, recorded_at
+                            FROM sector_bests
+                            ORDER BY recorded_at DESC";
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                records.Add(ReadRecord(reader));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SimHub.Logging.Current.Error($"Failed to load all records: {ex}");
+                throw;
+            }
+            return records;
+        }
+
+        private static SectorBestRecord ReadRecord(SQLiteDataReader reader)
+        {
+            return new SectorBestRecord
+            {
+                Id = reader.GetInt32(0),
+                TrackId = reader.GetString(1),
+                SectorNumber = reader.GetInt32(2),
+                BestTimeSec = reader.GetDouble(3),
+                CarModel = reader.GetString(4),
+                WeatherType = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                TrackTempCelsius = reader.IsDBNull(6) ? 0 : reader.GetDouble(6),
+                AirTempCelsius = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
+                GripLevel = reader.IsDBNull(8) ? "" : reader.GetString(8),
+                RecordedAt = DateTime.Parse(reader.GetString(9))
+            };
         }
     }
 }

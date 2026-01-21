@@ -37,6 +37,11 @@ namespace User.PluginMiniSectors
         private readonly SectorTimingEngine _engine;
         private readonly TrackConditions _conditions = new TrackConditions();
 
+        /// <summary>
+        /// Exposes the repository for SettingsControl to query records.
+        /// </summary>
+        internal ISectorBestRepository Repository => _repository;
+
         public DataPluginMiniSectors()
         {
             _repository = new SectorBestRepository();

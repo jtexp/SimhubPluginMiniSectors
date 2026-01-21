@@ -14,6 +14,10 @@ namespace User.PluginMiniSectors
         private readonly UpdateChecker _updateChecker;
         private UpdateCheckResult _lastCheckResult;
 
+        // Records tab state
+        private bool _recordsLoaded = false;
+        private bool _allRecordsLoaded = false;
+
         public DataPluginMiniSectors Plugin => _plugin;
 
         public SettingsControl()
@@ -199,6 +203,69 @@ namespace User.PluginMiniSectors
                 {
                     // Clipboard access can fail, ignore
                 }
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // Records Tab
+        // ----------------------------------------------------------------
+
+        private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Only handle our own tab control's selection changes
+            if (e.Source != MainTabControl)
+                return;
+
+            // Auto-load when Records tab is selected for the first time
+            if (MainTabControl.SelectedItem == RecordsTab && !_recordsLoaded)
+            {
+                LoadRecords(limit: 500);
+            }
+        }
+
+        private void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            LoadRecords(_allRecordsLoaded ? -1 : 500);
+        }
+
+        private void LoadAll_Click(object sender, RoutedEventArgs e)
+        {
+            _allRecordsLoaded = true;
+            LoadRecords(limit: -1);
+            LoadAllButton.IsEnabled = false;
+        }
+
+        private void LoadRecords(int limit)
+        {
+            ErrorBorder.Visibility = Visibility.Collapsed;
+
+            // Check if plugin and repository are available
+            if (_plugin?.Repository == null)
+            {
+                ErrorBorder.Visibility = Visibility.Visible;
+                ErrorText.Text = "Plugin not initialized. Please restart SimHub.";
+                return;
+            }
+
+            try
+            {
+                var records = limit > 0
+                    ? _plugin.Repository.GetRecentRecords(limit)
+                    : _plugin.Repository.GetAllRecords();
+
+                RecordsGrid.ItemsSource = records;
+                _recordsLoaded = true;
+
+                var countText = limit > 0 && records.Count >= limit
+                    ? $"Showing {records.Count} most recent records"
+                    : $"{records.Count} records";
+                RecordCountText.Text = countText;
+            }
+            catch (Exception ex)
+            {
+                ErrorBorder.Visibility = Visibility.Visible;
+                ErrorText.Text = $"Unable to load records: {ex.Message}";
+                SimHub.Logging.Current.Error($"Failed to load records in settings UI: {ex}");
             }
         }
     }
