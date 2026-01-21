@@ -1,100 +1,35 @@
 # MiniSectors - SimHub Plugin
 
-A SimHub plugin that creates mini sectors (per-corner timing) for sim racing. Tracks your time through each corner/section of a track and exposes data properties for use in SimHub dashboards.
-
-## Supported Simulators
-
-- **Assetto Corsa Competizione (ACC)**
+A SimHub plugin that tracks per-corner timing for sim racing. Know exactly how you're performing through each section of the track.
 
 ## Features
 
-- **Per-corner tracking**: Identifies which corner/section you're in based on track position
-- **Sector timing**: Tracks time spent in each sector (defined by corner boundaries)
-- **Current lap times**: Per-sector times for the lap in progress
-- **Last lap times**: Per-sector times for your previous completed lap
-- **24 tracks mapped**: Comprehensive corner definitions for popular ACC tracks
-
-## Supported Tracks
-
-| Track | Corners |
-|-------|---------|
-| Barcelona | 11 |
-| Brands Hatch | 16 |
-| Circuit of the Americas (COTA) | 20 |
-| Donington Park | 12 |
-| Hungaroring | 16 |
-| Imola | 7 |
-| Kyalami | 12 |
-| Laguna Seca | 10 |
-| Misano | 7 |
-| Monza | 8 |
-| Mount Panorama (Bathurst) | 16 |
-| Nurburgring GP | 11 |
-| Nurburgring 24h (Nordschleife) | 43 |
-| Oulton Park | 15 |
-| Paul Ricard | 11 |
-| Silverstone | 17 |
-| Snetterton | 12 |
-| Spa-Francorchamps | 15 |
-| Suzuka | 13 |
-| Watkins Glen | 9 |
-| Zandvoort | 12 |
-| Zolder | 12 |
-
-## Exposed SimHub Properties
-
-Use these properties in your SimHub dashboards with the prefix `[Minisectors]`:
-
-### Track & Position
-| Property | Type | Description |
-|----------|------|-------------|
-| `TrackId` | string | Current track identifier |
-| `TrackPositionPercent` | double | Position on track (0.0 - 1.0) |
-| `CurrentTurn` | string | Name of current corner/section |
-| `CurrentSectorNumber` | int | Current sector index (1-based) |
-| `SectorCountForTrack` | int | Total number of sectors for track |
-
-### Timing
-| Property | Type | Description |
-|----------|------|-------------|
-| `CurrentSectorTime` | double | Elapsed time in current sector (seconds) |
-| `LastCompletedSectorTime` | double | Time of last completed sector (seconds) |
-| `SectorTime_01` - `SectorTime_60` | double | Per-sector times for current lap |
-| `LastLapSectorTime_01` - `LastLapSectorTime_60` | double | Per-sector times for previous lap |
+- Per-corner timing for 24+ ACC tracks
+- Current lap and last lap sector times
+- Session best and all-time best tracking (stored in SQLite)
+- Properties exposed for use in SimHub dashboards
 
 ## Installation
 
-1. Build the project (requires SimHub SDK references)
-2. Copy the DLL to your SimHub plugins folder
-3. Enable the plugin in SimHub settings
+1. Download `User.PluginMiniSectors.zip` from the [latest nightly release](https://github.com/jtexp/SimhubPluginMiniSectors/releases/tag/nightly)
+2. Extract the contents to your SimHub installation folder (e.g., `C:\Program Files (x86)\SimHub\`)
+3. Restart SimHub
+4. Enable "Minisectors" in SimHub's Plugins settings
 
-## Building
+## Usage
 
-Set the `SIMHUB_INSTALL_PATH` environment variable to your SimHub installation directory, then:
+Once installed, access sector timing properties in your dashboards with the `[Minisectors]` prefix:
 
-```bash
-msbuild User.PluginMiniSectors.csproj /p:Configuration=Debug
-```
+- `[Minisectors].CurrentTurn` - Current corner name
+- `[Minisectors].CurrentSectorTime` - Time in current sector
+- `[Minisectors].SectorTime_01` through `SectorTime_60` - Per-sector times
 
-The post-build event automatically copies the output to SimHub.
+View your stored records in the plugin settings under the **Records** tab.
 
-## Adding New Tracks
+## Supported Games
 
-Edit `DataPluginMiniSectors.cs` and add entries to the `TrackTurnMap` dictionary:
+- Assetto Corsa Competizione (ACC)
 
-```csharp
-["track_name"] = new[]
-{
-    new RangeLabel(0.050, 0.100, "Turn 1"),
-    new RangeLabel(0.150, 0.200, "Turn 2"),
-    // ... more corners
-},
-```
+## Contributing
 
-- `track_name`: Must match `TrackName` from game telemetry (case-insensitive)
-- Each `RangeLabel`: start position, end position, corner name
-- Positions are `TrackPositionPercent` values (0.0 - 1.0)
-
-## Roadmap
-
-See [ROADMAP.md](ROADMAP.md) for planned features.
+See [CLAUDE.md](CLAUDE.md) for development setup and architecture details.
