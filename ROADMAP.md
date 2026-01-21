@@ -197,3 +197,22 @@ When a lap completes, current lap sector times are cleared and copied to "last l
 - **Export/import personal bests** - Share or backup your data
 - **Sector performance trends** - Visualize improvement over time
 - **ACC native sector integration** - Compare mini sectors against ACC's built-in sector data
+
+---
+
+## SDLC / Project Management
+
+This roadmap is currently maintained as a markdown file. Consider migrating to GitHub Issues and Projects for better tracking:
+
+**Benefits of GitHub Projects:**
+- Issues link to PRs and auto-close on merge
+- Kanban board view for visual progress tracking
+- Discussion threads on each feature
+- Milestones and due dates
+- Better visibility for contributors
+
+**Migration path:**
+1. Create a GitHub Issue for each feature above
+2. Create a GitHub Project board with columns: Backlog, In Progress, Done
+3. Add issues to the project
+4. Archive this ROADMAP.md or keep it as a high-level summary
