@@ -124,6 +124,51 @@ When a lap completes, current lap sector times are cleared and copied to "last l
 
 ---
 
+## Feature 6: Custom Sector Definition via Hotkey
+
+**Goal**: Allow users to define their own sector boundaries by pressing a hotkey while driving.
+
+**How It Works**:
+- User starts a "recording" mode from plugin settings or via hotkey
+- While driving, press the hotkey at each point where a sector should end
+- Plugin captures current `TrackPositionPercent` as sector boundary
+- Boundaries saved to database for that track
+- Custom sectors override the default turn-based sectors
+
+**Implementation**:
+- Add `custom_sectors` table to SQLite: `(track_id, sector_number, end_position)`
+- Add SimHub action `StartSectorRecording` / `EndSectorRecording`
+- Add SimHub action `MarkSectorBoundary` - captures current position
+- Plugin setting to choose: "Use default sectors" / "Use custom sectors"
+- UI in settings to view/edit/delete custom sector definitions
+
+**Use Case**: Similar to iRacing's sector customization - drivers can define sectors that match their analysis needs (e.g., sector per straight, per complex, etc.).
+
+---
+
+## Feature 7: Even Split Sectors
+
+**Goal**: Automatically divide the track into N equal sectors based on track position.
+
+**How It Works**:
+- User specifies number of sectors (e.g., 10)
+- Plugin divides track evenly: sector 1 = 0-10%, sector 2 = 10-20%, etc.
+- No need for per-track corner definitions
+- Works on any track immediately
+
+**Implementation**:
+- Add plugin setting: "Sector mode" with options:
+  - "Turn-based" (default) - use `TrackTurnMap` definitions
+  - "Even split" - divide by count
+  - "Custom" - use user-defined boundaries
+- Add setting: "Number of sectors" (default: 10, range: 3-30)
+- Modify `SectorTimingEngine` to calculate sector from position when in even-split mode
+- Sector boundaries: `position * sectorCount` rounded down + 1
+
+**Use Case**: Quick setup for tracks without corner definitions, or for users who prefer consistent sector counts across all tracks.
+
+---
+
 ## Implementation Priority
 
 1. **Delta Display** - Leverages existing best times, high dashboard value
@@ -131,6 +176,8 @@ When a lap completes, current lap sector times are cleared and copied to "last l
 3. **Per-Car All-Time Best Filtering** - Add setting to filter all-time bests by car (default) or all cars
 4. **Last Reported Sector Times** - Simple array addition, high dashboard value
 5. **Bundled Overlay** - Complete user experience with ready-to-use dashboard
+6. **Even Split Sectors** - Simple calculation, works on any track
+7. **Custom Sector Definition** - More complex, requires recording UI and hotkey handling
 
 ---
 
