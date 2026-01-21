@@ -101,12 +101,36 @@ When a lap completes, current lap sector times are cleared and copied to "last l
 
 ---
 
+## Feature 5: Bundled Overlay Dashboard
+
+**Goal**: Provide a ready-to-use SimHub overlay that displays sector times while racing.
+
+**Current State**: Initial version exists at `DashTemplates/John - Mini Sectors/` with JavaScript extensions for formatting sector times.
+
+**Planned Features**:
+- Bundle overlay dashboard with the plugin repository
+- Add "Install Overlay" button in plugin settings to copy dashboard to SimHub
+- Display current sector, last completed sector time, and delta vs best
+- Show session best and all-time best comparison
+- Compact overlay suitable for racing without obscuring view
+
+**Implementation**:
+- Store dashboard template in repo under `Dashboard/` folder
+- Add button in SettingsControl.xaml to install/update the dashboard
+- Copy dashboard files to `SimHub\DashTemplates\MiniSectors\` on install
+- Detect if dashboard already exists and offer to update
+
+**Use Case**: Users get a working overlay out of the box without needing to build their own dashboard.
+
+---
+
 ## Implementation Priority
 
 1. **Delta Display** - Leverages existing best times, high dashboard value
 2. **Theoretical Best** - Aggregation of existing data
 3. **Per-Car All-Time Best Filtering** - Add setting to filter all-time bests by car (default) or all cars
 4. **Last Reported Sector Times** - Simple array addition, high dashboard value
+5. **Bundled Overlay** - Complete user experience with ready-to-use dashboard
 
 ---
 
