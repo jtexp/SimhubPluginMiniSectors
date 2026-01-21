@@ -165,10 +165,41 @@ namespace User.PluginMiniSectors
 
         private void ShowStatus(string message, PackIconMaterialKind icon, Brush color)
         {
+            _lastStatusMessage = message;
             StatusBorder.Visibility = Visibility.Visible;
             StatusText.Text = message;
             StatusIcon.Kind = icon;
             StatusIcon.Foreground = color;
+        }
+
+        private string _lastStatusMessage;
+
+        private void StatusBorder_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_lastStatusMessage))
+            {
+                try
+                {
+                    Clipboard.SetText(_lastStatusMessage);
+                    // Brief visual feedback - flash the background
+                    var originalBackground = StatusBorder.Background;
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55));
+                    var timer = new System.Windows.Threading.DispatcherTimer
+                    {
+                        Interval = TimeSpan.FromMilliseconds(150)
+                    };
+                    timer.Tick += (s, args) =>
+                    {
+                        StatusBorder.Background = originalBackground;
+                        timer.Stop();
+                    };
+                    timer.Start();
+                }
+                catch
+                {
+                    // Clipboard access can fail, ignore
+                }
+            }
         }
     }
 }

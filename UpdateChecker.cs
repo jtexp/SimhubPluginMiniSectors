@@ -80,6 +80,13 @@ namespace User.PluginMiniSectors
         public static string GetCurrentVersion()
         {
             var assembly = Assembly.GetExecutingAssembly();
+            // Try to get informational version first (e.g., "0.0.0-nightly")
+            var infoVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            if (infoVersion != null && !string.IsNullOrEmpty(infoVersion.InformationalVersion))
+            {
+                return infoVersion.InformationalVersion;
+            }
+            // Fall back to numeric version
             var version = assembly.GetName().Version;
             return $"{version.Major}.{version.Minor}.{version.Build}";
         }

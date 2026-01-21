@@ -105,6 +105,7 @@
       <HintPath>$(SIMHUB_INSTALL_PATH)WoteverLocalization.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SIMHUB_INSTALL_PATH)Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
