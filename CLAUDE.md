@@ -27,6 +27,12 @@ msbuild User.PluginMiniSectors.csproj /p:Configuration=Debug
 
 **Debug:** Set debug target to SimHub's main exe (`SimHubWPF.exe`).
 
+**Troubleshooting:** If something goes wrong during manual testing, check the SimHub log at:
+```
+C:\Program Files (x86)\SimHub\Logs\SimHub.txt
+```
+Plugin errors and exceptions will appear here with timestamps.
+
 ## Architecture
 
 ### Core Plugin Class
