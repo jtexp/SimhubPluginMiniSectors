@@ -1,0 +1,160 @@
+name: Nightly Release
+
+on:
+  schedule:
+    - cron: '0 11 * * *'  # 6am CDT / 5am CST
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Find latest successful build
+        id: find
+        run: |
+          # Get the latest successful Build workflow run on main
+          RUN_INFO=$(gh run list \
+            --workflow=build.yml \
+            --branch=main \
+            --status=success \
+            --limit=1 \
+            --json headSha,databaseId \
+            --jq '.[0]')
+
+          if [ -z "$RUN_INFO" ] || [ "$RUN_INFO" = "null" ]; then
+            echo "No successful builds found"
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "## ⏭️ Nightly Release Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "No successful builds found on main branch." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          COMMIT_SHA=$(echo "$RUN_INFO" | jq -r '.headSha')
+          RUN_ID=$(echo "$RUN_INFO" | jq -r '.databaseId')
+
+          echo "commit_sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "found=true" >> $GITHUB_OUTPUT
+          echo "Latest successful build: commit $COMMIT_SHA (run $RUN_ID)"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Download CI artifact as zip
+        id: download
+        if: steps.find.outputs.found == 'true'
+        run: |
+          # Get artifact ID from run
+          ARTIFACT_ID=$(gh api repos/${{ github.repository }}/actions/runs/${{ steps.find.outputs.run_id }}/artifacts \
+            --jq '.artifacts[] | select(.name == "User.PluginMiniSectors") | .id')
+
+          if [ -z "$ARTIFACT_ID" ]; then
+            echo "available=false" >> $GITHUB_OUTPUT
+            echo "CI artifact no longer available (expired after 90 days)"
+            echo "## ⏭️ Nightly Release Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "CI artifact no longer available (expired after 90 days)." >> $GITHUB_STEP_SUMMARY
+            echo "The existing nightly release is assumed to still be valid." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          # Download artifact as zip (API returns raw zip file)
+          gh api repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip > User.PluginMiniSectors.zip
+
+          if [ -s User.PluginMiniSectors.zip ]; then
+            echo "available=true" >> $GITHUB_OUTPUT
+            echo "Downloaded CI artifact as zip (artifact ID: $ARTIFACT_ID)"
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+            echo "Failed to download artifact"
+            echo "## ❌ Nightly Release Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Failed to download CI artifact (artifact ID: $ARTIFACT_ID)." >> $GITHUB_STEP_SUMMARY
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Check if update needed
+        id: check
+        if: steps.find.outputs.found == 'true' && steps.download.outputs.available == 'true'
+        run: |
+          COMMIT_SHA="${{ steps.find.outputs.commit_sha }}"
+
+          # Check if nightly tag exists and points to correct commit
+          NIGHTLY_SHA=$(gh api repos/${{ github.repository }}/git/ref/tags/nightly --jq '.object.sha' 2>/dev/null || echo "")
+
+          if [ "$NIGHTLY_SHA" != "$COMMIT_SHA" ]; then
+            echo "Tag missing or points to different commit"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Tag points to correct commit, verifying release..."
+
+          # Check if release exists for nightly tag
+          RELEASE_INFO=$(gh release view nightly --json assets,tagName 2>/dev/null || echo "")
+
+          if [ -z "$RELEASE_INFO" ]; then
+            echo "Release missing for nightly tag"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check if release has the zip asset
+          ZIP_ASSET=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name == "User.PluginMiniSectors.zip")' || echo "")
+
+          if [ -z "$ZIP_ASSET" ]; then
+            echo "Release exists but zip asset is missing"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Compute hash of CI artifact zip (already downloaded)
+          CI_ZIP_HASH=$(sha256sum User.PluginMiniSectors.zip | cut -d' ' -f1)
+
+          # Download release asset and compute hash
+          RELEASE_ZIP_URL=$(echo "$ZIP_ASSET" | jq -r '.url')
+          gh api "$RELEASE_ZIP_URL" -H "Accept: application/octet-stream" > /tmp/release.zip
+          RELEASE_ZIP_HASH=$(sha256sum /tmp/release.zip | cut -d' ' -f1)
+
+          if [ "$CI_ZIP_HASH" != "$RELEASE_ZIP_HASH" ]; then
+            echo "Release zip hash ($RELEASE_ZIP_HASH) doesn't match CI artifact ($CI_ZIP_HASH)"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Release is up to date with correct artifact"
+          echo "needs_update=false" >> $GITHUB_OUTPUT
+          echo "## ✅ Nightly Release Up to Date" >> $GITHUB_STEP_SUMMARY
+          echo "Release already exists with correct artifact at commit \`$COMMIT_SHA\`." >> $GITHUB_STEP_SUMMARY
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Delete existing nightly release
+        if: steps.check.outputs.needs_update == 'true'
+        run: gh release delete nightly --yes --cleanup-tag || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Create nightly release
+        if: steps.check.outputs.needs_update == 'true'
+        run: |
+          gh release create nightly \
+            User.PluginMiniSectors.zip \
+            --target ${{ steps.find.outputs.commit_sha }} \
+            --title "Nightly Build" \
+            --notes "Automated nightly build from main branch.
+
+          Built: $(date -u '+%Y-%m-%d %H:%M') UTC
+          Commit: ${{ steps.find.outputs.commit_sha }}" \
+            --prerelease
+
+          echo "## 🚀 Nightly Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "Released commit \`${{ steps.find.outputs.commit_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Release](https://github.com/${{ github.repository }}/releases/tag/nightly)" >> $GITHUB_STEP_SUMMARY
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
