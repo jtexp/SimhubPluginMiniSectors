@@ -3,8 +3,12 @@ name: Build
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.github/workflows/nightly.yml'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '.github/workflows/nightly.yml'
 
 jobs:
   build:
