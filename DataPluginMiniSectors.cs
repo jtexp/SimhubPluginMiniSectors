@@ -1,6 +1,8 @@
 using GameReaderCommon;
 using SimHub.Plugins;
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Media;
 
 namespace User.PluginMiniSectors
@@ -89,6 +91,15 @@ namespace User.PluginMiniSectors
 
         public void Init(PluginManager pluginManager)
         {
+            // Handle assembly version mismatches (e.g., Newtonsoft.Json) by using
+            // whatever version SimHub already loaded
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                var requestedAssembly = new AssemblyName(args.Name);
+                return AppDomain.CurrentDomain.GetAssemblies()
+                    .FirstOrDefault(a => a.GetName().Name == requestedAssembly.Name);
+            };
+
             SimHub.Logging.Current.Info("Starting plugin");
 
             Settings = this.ReadCommonSettings<PluginSettings>("GeneralSettings", () => new PluginSettings());
