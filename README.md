@@ -33,3 +33,5 @@ View your stored records in the plugin settings under the **Records** tab.
 ## Contributing
 
 See [CLAUDE.md](CLAUDE.md) for development setup and architecture details.
+
+See [ROADMAP.md](ROADMAP.md) for planned features.
