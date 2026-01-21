@@ -11,9 +11,17 @@ namespace User.PluginMiniSectors
         public const int MaxSectors = 15;
         public const double NoData = -1.0;
 
+        // Timing thresholds
+        private const double MinSectorTimeSec = 0.5;
+        private const double LapTimeResetThresholdSec = 1.0;
+
         // --------------------------------------------------------------------
         // Public read-only properties
         // --------------------------------------------------------------------
+        // Note: These properties are written by the telemetry update thread
+        // and read by the UI/dashboard thread. For primitive types (int, double, string references),
+        // this is generally safe on modern systems, but for strict thread safety,
+        // consider adding the volatile keyword or using locks if multi-threaded consistency is critical.
 
         public string CurrentTurn { get; private set; } = "";
         public int CurrentSectorNumber { get; private set; } = 0;
@@ -179,13 +187,6 @@ namespace User.PluginMiniSectors
             return ranges.Length;
         }
 
-        private static bool IsLapWrap(double prevTp, double curTp)
-        {
-            // TrackPositionPercent should move 0..1 and wrap.
-            // Use a tolerant condition: "near end" -> "near start"
-            return prevTp > 0.95 && curTp < 0.05;
-        }
-
         private static void InitializeArrayToUnset(double[] array)
         {
             for (int i = 0; i < array.Length; i++)
@@ -285,7 +286,7 @@ namespace User.PluginMiniSectors
 
             // Lap wrap detection: use lap time reset as the authoritative signal
             // This is the most reliable indicator - the game knows when a lap is completed
-            bool lapTimeReset = currentLapTimeSec < _prevLapTimeSec - 1.0; // Allow small jitter
+            bool lapTimeReset = currentLapTimeSec < _prevLapTimeSec - LapTimeResetThresholdSec;
             bool lapWrapped = lapTimeReset;
 
             if (lapWrapped)
@@ -300,7 +301,6 @@ namespace User.PluginMiniSectors
                     double finalSectorTime = effectiveLapTime - _sectorStartLapTimeSec;
 
                     // Minimum sector time threshold to filter out glitches
-                    const double MinSectorTimeSec = 0.5;
                     if (finalSectorTime >= MinSectorTimeSec)
                     {
                         _currentLapSectorTimesSec[_prevSectorNumber] = finalSectorTime;
@@ -320,8 +320,15 @@ namespace User.PluginMiniSectors
                                 // Persist to repository
                                 if (_repository != null && !string.IsNullOrWhiteSpace(_currentCarModel))
                                 {
-                                    _repository.SaveSectorBest(TrackId, _prevSectorNumber, finalSectorTime,
-                                                               _currentCarModel, _currentConditions);
+                                    try
+                                    {
+                                        _repository.SaveSectorBest(TrackId, _prevSectorNumber, finalSectorTime,
+                                                                   _currentCarModel, _currentConditions);
+                                    }
+                                    catch
+                                    {
+                                        // Silently ignore database errors
+                                    }
                                 }
                             }
                         }
@@ -349,7 +356,6 @@ namespace User.PluginMiniSectors
                 double completedSectorTime = currentLapTimeSec - _sectorStartLapTimeSec;
 
                 // Minimum sector time threshold to filter out glitches
-                const double MinSectorTimeSec = 0.5;
                 if (prevSector >= 1 && prevSector <= MaxSectors && completedSectorTime >= MinSectorTimeSec)
                 {
                     _currentLapSectorTimesSec[prevSector] = completedSectorTime;
@@ -369,8 +375,15 @@ namespace User.PluginMiniSectors
                             // Persist to repository
                             if (_repository != null && !string.IsNullOrWhiteSpace(_currentCarModel))
                             {
-                                _repository.SaveSectorBest(TrackId, prevSector, completedSectorTime,
-                                                           _currentCarModel, _currentConditions);
+                                try
+                                {
+                                    _repository.SaveSectorBest(TrackId, prevSector, completedSectorTime,
+                                                               _currentCarModel, _currentConditions);
+                                }
+                                catch
+                                {
+                                    // Silently ignore database errors
+                                }
                             }
                         }
                     }
